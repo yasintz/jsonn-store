@@ -1,5 +1,6 @@
 type BooleanType = 'boolean';
 type StringType = 'string';
+
 export type TableColumnType = BooleanType | StringType;
 
 export interface TableColumn {

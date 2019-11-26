@@ -4,10 +4,11 @@ import { makeid } from '../../utils';
 import { jsonTable } from '../../database/table';
 import { getUser } from '../../database/functions';
 import { generateViewLink, generateApiLink } from '~/server/utils/link';
+
 function responseCreator(req: Request, id: string) {
   return {
     url: generateApiLink(req, id),
-    id: id,
+    id,
     view: generateViewLink(req, id),
   };
 }

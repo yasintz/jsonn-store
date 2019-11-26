@@ -17,7 +17,7 @@ module.exports = {
       },
     },
   ],
-  modify: (config, { target, dev }) => {
+  modify: (config) => {
     config.resolve['alias'] = {
       '~': path.resolve('./src'),
     };

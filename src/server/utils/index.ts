@@ -33,6 +33,7 @@ function resultHandler(db: JsonTable, dbPath?: string, schema?: string) {
   if (schema) {
     result = jsonParser(result, schema);
   }
+
   return result;
 }
 function numberWithCommas(x: number) {

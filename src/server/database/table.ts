@@ -10,9 +10,10 @@ function table<T>(name: string, columns: TableColumn[], sql?: string) {
   const columnsString = columns
     .map(column => `${column.name} ${TABLE_TYPE_MAP[column.type]} ${column.primaryKey ? 'PRIMARY KEY' : ''}`)
     .join(',');
+
   return {
     tableName,
-    createSql: `CREATE TABLE IF NOT EXISTS ${tableName} (${columnsString} ${sql ? sql : ''});`,
+    createSql: `CREATE TABLE IF NOT EXISTS ${tableName} (${columnsString} ${sql || ''});`,
     insertSql: `INSERT INTO ${name} (${columns.map(col => col.name).join(',')}) VALUES (${columns
       .map((col, index) => `$${index + 1}`)
       .join(',')})`,

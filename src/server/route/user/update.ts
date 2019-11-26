@@ -3,6 +3,7 @@ import md5 from 'md5';
 import { getUser } from '../../database/functions';
 import database from '../../database';
 import { userTable } from '../../database/table';
+
 const getDbItems = (body: any, userId: string) => {
   if (body.username && body.password) {
     return {
@@ -16,11 +17,13 @@ const getDbItems = (body: any, userId: string) => {
       params: [body.username, userId],
     };
   }
+
   return {
     sql: `UPDATE ${userTable.tableName} SET password = $1  WHERE id = $2`,
     params: [md5(body.password), , userId],
   };
 };
+
 export default (route: string, app: Express) => {
   app.put(`${route}`, (req, res) => {
     const { username, password } = req.headers as {

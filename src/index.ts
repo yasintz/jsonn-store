@@ -23,6 +23,7 @@ export default express()
   .listen(port, (err: Error) => {
     if (err) {
       console.error(err);
+
       return;
     }
     console.log(`> Started on port ${port}`);

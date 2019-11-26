@@ -27,7 +27,16 @@
       "~/*": ["src/*"]
     }
   },
-  "exclude": ["node_modules/**/*", "build", "scripts", "acceptance-tests", "webpack", "jest", "razzle.config.js"],
+  "exclude": [
+    "node_modules/**/*",
+    "build",
+    "scripts",
+    "acceptance-tests",
+    "webpack",
+    "jest",
+    "razzle.config.js",
+    "node_modules/@types/react-native/**/*"
+  ],
   // "types": ["typePatches", "node", "webpack-env"]
   "types": ["react", "jest"]
 }

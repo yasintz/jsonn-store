@@ -5,6 +5,7 @@ registerHelper('filter', ({ args, node, next }) => {
   if (Array.isArray(node) && operator === '>') {
     return next(node.filter(item => item[key] > parseFloat(arg)));
   }
+
   return next(node);
 });
 

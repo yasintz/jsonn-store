@@ -1,14 +1,21 @@
 import React from 'react';
+import styled from 'styled-components';
 import logo from '../assets/icons/close.svg';
+
+const StyledDiv = styled.div`
+  color: red;
+`;
 
 class Home extends React.Component<{}, {}> {
   public render() {
     return (
       <div className="Home">
-        <div className="Home-header">
-          <img src={logo} className="Home-logo" alt="logo" />
-          <h2>Welcome to Razzles</h2>
-        </div>
+        <StyledDiv>
+          <div className="Home-header">
+            <img src={logo} className="Home-logo" alt="logo" />
+            <h2>Welcome to Razzles</h2>
+          </div>
+        </StyledDiv>
         <p className="Home-intro">
           To get started, edit <code>src/App.tsx</code> or <code>src/Home.tsx</code> and save to reload.
         </p>

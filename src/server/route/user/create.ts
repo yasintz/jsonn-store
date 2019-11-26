@@ -4,6 +4,7 @@ import { getUser } from '../../database/functions';
 import database from '../../database';
 import { userTable } from '../../database/table';
 import { makeid } from '../../utils';
+
 export default (route: string, app: Express) => {
   app.post(route, async (req, res) => {
     const body = {
