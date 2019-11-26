@@ -6,7 +6,7 @@
     "crn": "rm -rf node_modules/@types/react-native",
     "dev": "yarn crn && razzle start",
     "build": "yarn crn && razzle build",
-    "start": "NODE_ENV=production node build/server.js",
+    "start": "node build/server.js",
     "lint": "eslint './src/**/*.ts*' './test/**/*.test.ts*' --cache",
     "generate-type": "node scripts/type-generator.js",
     "prettier": "prettier  --ignore-path ./.prettierignore  **/*.ts*",
