@@ -60,6 +60,7 @@ export default (app: Express) => {
             <meta charSet='utf-8' />
             <title>Razzle TypeScript 2</title>
             <meta name="viewport" content="width=device-width, initial-scale=1">
+             <script src="/socket.io/socket.io.js"></script>
             ${styleTags}
             ${importFiles()}
             <script>

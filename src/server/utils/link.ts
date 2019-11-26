@@ -11,7 +11,7 @@ function generateApiLink(req: Request, id?: string) {
 function generateViewLink(req: Request, id?: string) {
   const originUrl = new URL(`${req.protocol}://${req.get('host')}${req.originalUrl}`).origin;
   const apiUrl = originUrl.replace('http://', httpsProtocol);
-  const url = new URL(id ? `/json/${id}` : '', apiUrl).href;
+  const url = new URL(id ? `?id=${id}` : '', apiUrl).href;
 
   return url;
 }
