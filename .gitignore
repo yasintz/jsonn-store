@@ -1,0 +1,16 @@
+*.log
+dist/*
+node_modules/*
+.eslintcache
+logs
+*.log
+npm-debug.log*
+.DS_Store
+
+coverage
+build
+public/static
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
