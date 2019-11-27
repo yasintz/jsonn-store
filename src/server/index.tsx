@@ -1,5 +1,7 @@
+import bodyParser from 'body-parser';
 import express from 'express';
 import database from './database';
+// import database from './database/models';
 import jsonGet from './route/json/get';
 import jsonUpdate from './route/json/update';
 import jsonCreate from './route/json/create';
@@ -10,7 +12,10 @@ import home from './route/home';
 const app = express()
   .disable('x-powered-by')
   // eslint-disable-next-line
-  .use(express.static(process.env.RAZZLE_PUBLIC_DIR!));
+  .use(express.static(process.env.RAZZLE_PUBLIC_DIR!))
+  .use(express.json({ limit: '50mb' }))
+  .use(express.urlencoded({ limit: '50mb', extended: false }))
+  .use(bodyParser.json());
 
 database.init(() => {
   jsonGet('/api/json', app);

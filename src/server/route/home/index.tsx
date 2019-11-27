@@ -5,7 +5,7 @@ import { ServerStyleSheet } from 'styled-components';
 import App from '~/client/app';
 import { getAllJson } from '~/server/database/functions';
 import { numberWithCommas } from '~/server/utils';
-import { generateApiLink } from '~/server/utils/link';
+import { AppContext } from '~/helpers';
 
 let assets: any;
 
@@ -27,51 +27,57 @@ function importFiles() {
       ${js}
       `;
 }
+function template(context: AppContext) {
+  const sheet = new ServerStyleSheet();
+  const markup = renderToString(sheet.collectStyles(<App pageContext={context} />));
+  const styleTags = sheet.getStyleTags();
 
-const iconUrl = 'https://user-images.githubusercontent.com/36041339/69496155-1cfc9580-0ee0-11ea-810e-ef60a567b708.png';
+  const title = 'Jsonn.Store';
+  const iconUrl =
+    'https://user-images.githubusercontent.com/36041339/69496155-1cfc9580-0ee0-11ea-810e-ef60a567b708.png';
 
-export default (app: Express) => {
-  app.get(`/`, async (req, res) => {
-    const originUrl = new URL('api/json', `${req.protocol}://${req.get('host')}${req.originalUrl}`).origin;
-    try {
-      const allJsons = await getAllJson();
-      const context = {
-        iconUrl,
-        postUrl: generateApiLink(req),
-        originUrl: `${originUrl}/json`,
-        jsonCount: numberWithCommas(allJsons.length),
-        isReadOnly: false,
-        app: {
-          name: {
-            text: 'Jsonn',
-            full: 'Jsonn.Store',
-            highlighted: '.Store',
-          },
-        },
-      };
-      const sheet = new ServerStyleSheet();
-      const markup = renderToString(sheet.collectStyles(<App pageContext={{}} />));
-      const styleTags = sheet.getStyleTags();
-      res.send(
-        `<!doctype html>
+  return `<!doctype html>
         <html lang="">
           <head>
             <meta http-equiv="X-UA-Compatible" content="IE=edge" />
             <meta charSet='utf-8' />
-            <title>Razzle TypeScript 2</title>
+            <title>${title}</title>
+             <link rel="icon" href="${iconUrl}" />
             <meta name="viewport" content="width=device-width, initial-scale=1">
              <script src="/socket.io/socket.io.js"></script>
             ${styleTags}
             ${importFiles()}
             <script>
-              window.PAGE_CONTEXT=${JSON.stringify(context)} 
+              window.PAGE_CONTEXT=${JSON.stringify(context)};
             </script>
           </head>
           <body>
             <div id="root">${markup}</div>
           </body>
-        </html>`,
-      );
+        </html>`;
+}
+
+export default (app: Express) => {
+  app.get(`/`, async (req, res) => {
+    const { id: databaseId } = req.query;
+    try {
+      const allJsons = await getAllJson();
+      const currentDabaase = allJsons.find(db => db.id === databaseId && !db.is_private);
+      if (databaseId && currentDabaase) {
+        const context: AppContext = {
+          jsonCount: allJsons.length,
+          mode: 'view',
+          database: {},
+        };
+        res.send(template(context));
+      } else {
+        const context: AppContext = {
+          database: {},
+          jsonCount: allJsons.length,
+          mode: 'create',
+        };
+        res.send(template(context));
+      }
     } catch (error) {
       // TODO: send error html
       res.send({ error });

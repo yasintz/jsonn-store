@@ -21,7 +21,11 @@ if (module.hot) {
 
 const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
-const server = http.createServer(express().use((req, res) => app.handle(req, res)));
+const server = http.createServer(
+  express().use((req, res) => {
+    app.handle(req, res);
+  }),
+);
 
 createSocketServer(server).on('connection', socket => socketConnectionHandler(socket));
 
