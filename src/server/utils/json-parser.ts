@@ -15,6 +15,7 @@ registerHelper('slice', ({ node, args, next }) => {
       return next(node.slice(parseInt(args[0], 10), parseInt(args[1], 10)));
     }
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
   }
 

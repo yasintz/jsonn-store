@@ -2,6 +2,7 @@
 import * as http from 'http';
 import express from 'express';
 import createSocketServer from 'socket.io';
+import database from './server/database';
 
 let app = require('./server').default;
 let socketConnectionHandler = require('./server/sockets').default;
@@ -20,15 +21,16 @@ if (module.hot) {
 }
 
 const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+const expressApp = express();
+const server = http.createServer(expressApp);
 
-const server = http.createServer(
-  express().use((req, res) => {
-    app.handle(req, res);
-  }),
-);
-
-createSocketServer(server).on('connection', socket => socketConnectionHandler(socket));
-
-export default server.listen(port, () => {
+database(connection => {
+  const socketServer = createSocketServer(server);
+  socketServer.on('connection', socket => {
+    socketConnectionHandler(socket, socketServer);
+  });
+  expressApp.use((req, res) => app(connection, socketServer).handle(req, res));
+});
+server.listen(port, () => {
   console.log(`> Started on port ${port}`);
 });

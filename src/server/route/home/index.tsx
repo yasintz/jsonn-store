@@ -1,10 +1,8 @@
 import React from 'react';
-import { Express } from 'express';
 import { renderToString } from 'react-dom/server';
 import { ServerStyleSheet } from 'styled-components';
+import { RouteType } from '~/server/helpers';
 import App from '~/client/app';
-import { getAllJson } from '~/server/database/functions';
-import { numberWithCommas } from '~/server/utils';
 import { AppContext } from '~/helpers';
 
 let assets: any;
@@ -27,8 +25,9 @@ function importFiles() {
       ${js}
       `;
 }
-function template(context: AppContext) {
+function template(context?: AppContext | null, hasError?: boolean) {
   const sheet = new ServerStyleSheet();
+  // @ts-ignore
   const markup = renderToString(sheet.collectStyles(<App pageContext={context} />));
   const styleTags = sheet.getStyleTags();
 
@@ -57,12 +56,12 @@ function template(context: AppContext) {
         </html>`;
 }
 
-export default (app: Express) => {
+const homeRoute: RouteType = (path, app, { db }) => {
   app.get(`/`, async (req, res) => {
     const { id: databaseId } = req.query;
     try {
-      const allJsons = await getAllJson();
-      const currentDabaase = allJsons.find(db => db.id === databaseId && !db.is_private);
+      const allJsons = await db.Json.getAllThePublic();
+      const currentDabaase = allJsons.find(jsonDb => jsonDb.id === databaseId);
       if (databaseId && currentDabaase) {
         const context: AppContext = {
           jsonCount: allJsons.length,
@@ -79,8 +78,9 @@ export default (app: Express) => {
         res.send(template(context));
       }
     } catch (error) {
-      // TODO: send error html
-      res.send({ error });
+      res.send(template(null, true));
     }
   });
 };
+
+export default homeRoute;

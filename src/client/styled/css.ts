@@ -58,6 +58,7 @@ ${styles.map(style => `.${style.className}{${style.css}}`).join('')}
 ${globals.join('\n')}
 `;
 
+// eslint-disable-next-line
 // @ts-ignore
 const _css: {
   (_styles: TemplateStringsArray, ...args: ExpressTypes[]): string;

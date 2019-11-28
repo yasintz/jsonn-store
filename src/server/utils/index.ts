@@ -1,5 +1,5 @@
 import lodash from 'lodash';
-import { JsonTable } from '../database/helpers';
+import { JsonTable } from '../database/models/json';
 import jsonParser from './json-parser';
 
 function makeid(length: number) {
@@ -11,24 +11,11 @@ function makeid(length: number) {
 
   return result;
 }
-async function asyncMap(array: (() => Promise<any>)[]): Promise<any> {
-  if (array.length === 0) {
-    return Promise.resolve();
-  }
-  if (array.length === 1) {
-    return array[0]();
-  }
-  for (let index = 0; index < array.length; index++) {
-    // eslint-disable-next-line no-await-in-loop
-    await array[index]();
-  }
 
-  return Promise.resolve();
-}
 function resultHandler(db: JsonTable, dbPath?: string, schema?: string) {
-  let result = JSON.parse(db.json);
+  let result = db.json;
   if (dbPath) {
-    result = lodash.get(result, dbPath);
+    result = lodash.get(result, dbPath, null);
   }
   if (schema) {
     result = jsonParser(result, schema);
@@ -40,4 +27,4 @@ function numberWithCommas(x: number) {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
-export { makeid, asyncMap, resultHandler, numberWithCommas };
+export { makeid, resultHandler, numberWithCommas };
