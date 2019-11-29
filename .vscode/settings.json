@@ -1,6 +1,7 @@
 {
   "files.exclude": {
     "build": true,
-    "coverage": true
+    "coverage": true,
+    "dist": true
   }
 }

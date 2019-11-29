@@ -4,6 +4,7 @@ import { ServerStyleSheet } from 'styled-components';
 import { RouteType } from '~/server/helpers';
 import App from '~/client/app';
 import { AppContext } from '~/helpers';
+import { JsonUserRole } from '~/server/database/models/user-json';
 
 let assets: any;
 
@@ -25,9 +26,8 @@ function importFiles() {
       ${js}
       `;
 }
-function template(context?: AppContext | null, hasError?: boolean) {
+function template(context: AppContext, hasError?: boolean) {
   const sheet = new ServerStyleSheet();
-  // @ts-ignore
   const markup = renderToString(sheet.collectStyles(<App pageContext={context} />));
   const styleTags = sheet.getStyleTags();
 
@@ -56,29 +56,32 @@ function template(context?: AppContext | null, hasError?: boolean) {
         </html>`;
 }
 
-const homeRoute: RouteType = (path, app, { db }) => {
+const homeRoute: RouteType = (app, { db }) => {
   app.get(`/`, async (req, res) => {
     const { id: databaseId } = req.query;
     try {
-      const allJsons = await db.Json.getAllThePublic();
-      const currentDabaase = allJsons.find(jsonDb => jsonDb.id === databaseId);
-      if (databaseId && currentDabaase) {
+      const jsonCount = await db.Json.getCount();
+      const currentDabaase = await db.Json.getJsonById(databaseId);
+      if (databaseId && currentDabaase && currentDabaase.read === JsonUserRole.everyone) {
         const context: AppContext = {
-          jsonCount: allJsons.length,
+          jsonCount,
           mode: 'view',
-          database: {},
+          database: {
+            id: currentDabaase.id,
+            json: currentDabaase.json,
+          },
         };
         res.send(template(context));
       } else {
         const context: AppContext = {
-          database: {},
-          jsonCount: allJsons.length,
+          jsonCount,
           mode: 'create',
         };
         res.send(template(context));
       }
     } catch (error) {
-      res.send(template(null, true));
+      // TODO: send error mode
+      // res.send(template(null, true));
     }
   });
 };

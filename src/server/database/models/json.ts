@@ -1,101 +1,98 @@
-import { Connection, Entity, Column, PrimaryColumn, Repository, ManyToOne } from 'typeorm';
+import { Entity, Column, OneToMany, PrimaryColumn, BaseEntity } from 'typeorm';
+import { JsonUserRole, UserJsonTable } from './user-json';
 import { makeid } from '~/utils';
-import { UserTable } from './user';
+import { dbError } from '~/server/utils/errors';
+import cache from '../cache';
 
 @Entity({
-  name: 'jsonss__table',
+  name: 'json',
 })
-class JsonTable {
+class JsonTable extends BaseEntity {
   @PrimaryColumn()
   id: string;
 
   @Column({ type: 'json' })
   json: any;
 
-  @ManyToOne(
-    type => UserTable,
-    user => user.jsons,
+  @OneToMany(
+    () => UserJsonTable,
+    ju => ju.json,
     { nullable: true },
   )
-  user: UserTable;
+  userConnection: UserJsonTable[];
 
-  @Column({ type: 'boolean' })
-  isPrivate: boolean;
+  @Column('varchar')
+  read: JsonUserRole;
 
-  constructor(json: any, isPrivate?: boolean, user?: UserTable) {
-    if (json) {
-      this.id = makeid(15);
-      this.json = json;
-      if (isPrivate && user) {
-        this.isPrivate = true;
-        this.user = user;
-      } else {
-        this.isPrivate = false;
-      }
-    }
-  }
+  @Column('varchar')
+  write: JsonUserRole;
+
+  userJson = () => {
+    return cache.get(`${this.id}_userJson`, () =>
+      UserJsonTable.find({
+        where: {
+          jsonId: this.id,
+        },
+        relations: ['user'],
+      }),
+    );
+  };
 }
 
 class Json {
-  private repository: Repository<JsonTable>;
+  create = (json: any, read: JsonUserRole, write: JsonUserRole) => {
+    return JsonTable.create({ id: makeid(15), json, read, write })
+      .save()
+      .then(j => {
+        cache.update('json_getCount', p => p + 1);
 
-  constructor(conn: Connection) {
-    this.repository = conn.getRepository(JsonTable);
-  }
-
-  savePublicJson = (json: any, user?: UserTable) => {
-    if (user) {
-      return this.repository.save(new JsonTable(json, false, user));
-    }
-
-    return this.repository.save(new JsonTable(json, false));
+        return j;
+      });
   };
 
-  savePrivateJson = (json: any, user: UserTable) => {
-    return this.repository.save(new JsonTable(json, true, user));
-  };
-
-  getJsonByIdWithRelatedUser = (jsonId: string) => {
-    return this.repository.findOne({ where: { id: jsonId }, relations: ['user'] });
-  };
-
-  updatePublicJson = async (jsonId: string, json: any, isPrivate?: boolean) => {
-    const jsonDb = await this.getJsonByIdWithRelatedUser(jsonId);
+  updatePublicJson = async (jsonId: string, json: any) => {
+    const jsonDb = await this.getJsonById(jsonId);
     if (jsonDb) {
       jsonDb.json = json;
-      if (typeof isPrivate === 'boolean') {
-        jsonDb.isPrivate = isPrivate;
-      }
+      const updatedJson = await jsonDb.save();
 
-      const updatedJson = await this.repository.save(jsonDb);
+      cache.del(`${jsonId}_getById`);
 
       return updatedJson;
     }
 
-    return jsonDb;
+    throw dbError('Json Not Found');
   };
 
-  updatePrivate = async (jsonId: string, user: UserTable, json: any, isPrivate?: boolean) => {
-    const jsonDb = await this.getJsonByIdWithRelatedUser(jsonId);
-    if (jsonDb && jsonDb.user.id === user.id) {
+  updatePrivateJson = async (jsonId: string, json: any, access: { read: JsonUserRole; write: JsonUserRole }) => {
+    const jsonDb = await this.getJsonById(jsonId);
+    if (jsonDb) {
       jsonDb.json = json;
-      if (typeof isPrivate === 'boolean') {
-        jsonDb.isPrivate = isPrivate;
-      }
+      jsonDb.read = access.read;
+      jsonDb.write = access.write;
+      const updatedJson = await jsonDb.save();
 
-      const updatedJson = await this.repository.save(jsonDb);
+      cache.del(`${jsonId}_getById`);
 
       return updatedJson;
     }
 
-    return jsonDb;
+    throw dbError('Json Not Found');
   };
 
-  getAllThePublic = async () => {
-    return this.repository.find({ where: { isPrivate: false } });
+  getJsonById = (jsonId: string) => {
+    return cache.get(`${jsonId}_getById`, () => JsonTable.findOne({ where: { id: jsonId } }));
   };
+
+  getCount = () =>
+    cache.get('json_getCount', () => {
+      return JsonTable.getRepository()
+        .createQueryBuilder('json')
+        .select('id')
+        .getCount();
+    });
 }
 
 export { JsonTable };
 
-export default Json;
+export default new Json();

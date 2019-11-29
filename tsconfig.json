@@ -3,16 +3,17 @@
     "allowJs": true,
     "allowUnreachableCode": false,
     "noFallthroughCasesInSwitch": true,
+    "outDir": "dist",
     "allowSyntheticDefaultImports": true,
     "downlevelIteration": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "jsx": "react",
-    "noEmit": true,
     "lib": ["es6", "es2015", "es2017", "dom"],
     "module": "esnext",
     "moduleResolution": "Node",
     "noImplicitAny": true,
+    "noEmit": true,
     "emitDecoratorMetadata": true,
     "strictPropertyInitialization": false,
     "experimentalDecorators": true,
@@ -36,10 +37,10 @@
     "scripts",
     "acceptance-tests",
     "webpack",
+    "coverage",
     "jest",
     "razzle.config.js",
     "node_modules/@types/react-native/**/*"
   ],
-  // "types": ["typePatches", "node", "webpack-env"]
-  "types": ["react", "jest"]
+  "types": ["typePatches", "node", "webpack-env"]
 }

@@ -16,8 +16,19 @@ registerHelper('slice', ({ node, args, next }) => {
     }
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
   }
+
+  return next(node);
+});
+
+registerHelper('getByKey', ({ node, args, next }) => {
+  const [key] = args;
+  try {
+    if (node !== undefined && node !== null && key) {
+      return next(node[key]);
+    }
+  } catch (error) {} // eslint-disable-line no-empty
 
   return next(node);
 });

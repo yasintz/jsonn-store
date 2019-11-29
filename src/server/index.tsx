@@ -3,17 +3,31 @@ import SocketIO from 'socket.io';
 import express from 'express';
 import { Connection } from 'typeorm';
 import { ServerContext } from './helpers';
-import getDbContext from '~/server/database/db-context';
-import jsonRoute from './route/json';
+import privateJsonRoute from './route/json/private';
+import publicJsonRoute from './route/json/public';
 import userRoute from './route/user';
+import loginRegisterRoute from './route/login-register';
 import home from './route/home';
+import authFactory from './middleware/auth';
+import Json from './database/models/json';
+import User from './database/models/user';
+import JsonUser from './database/models/user-json';
 
 const server = express();
+const apiRouter = express.Router();
+const baseRouter = express.Router();
+
+// eslint-disable-next-line
 
 function app(dbConnection: Connection, socket: SocketIO.Server) {
   const serverContext: ServerContext = {
-    db: getDbContext(dbConnection),
+    db: {
+      Json,
+      User,
+      JsonUser,
+    },
     socket,
+    JWT_SECRET: 'yasin-tazeoglu',
   };
   server
     .disable('x-powered-by')
@@ -23,9 +37,18 @@ function app(dbConnection: Connection, socket: SocketIO.Server) {
     .use(express.urlencoded({ limit: '50mb', extended: false }))
     .use(bodyParser.json());
 
-  userRoute('/api/user', server, serverContext);
-  jsonRoute('/api/json', server, serverContext);
-  home('/', server, serverContext);
+  /* auth */
+  server.use('/api', authFactory(serverContext) as any);
+  /* routes */
+  server.use('/api', apiRouter);
+  server.use('/', baseRouter);
+  /* public routes  */
+  home(baseRouter, serverContext);
+  loginRegisterRoute(baseRouter, serverContext);
+  publicJsonRoute(baseRouter, serverContext);
+  /* private routes  */
+  userRoute(apiRouter, serverContext);
+  privateJsonRoute(apiRouter, serverContext);
 
   return server;
 }

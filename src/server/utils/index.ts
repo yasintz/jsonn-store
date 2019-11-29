@@ -1,6 +1,11 @@
-import lodash from 'lodash';
-import { JsonTable } from '../database/models/json';
 import jsonParser from './json-parser';
+import { JsonUserRole } from '../database/models/user-json';
+
+const accessibilty: Record<JsonUserRole, JsonUserRole[]> = {
+  [JsonUserRole.everyone]: [JsonUserRole.everyone, JsonUserRole.admin, JsonUserRole.member],
+  [JsonUserRole.member]: [JsonUserRole.admin, JsonUserRole.member],
+  [JsonUserRole.admin]: [JsonUserRole.admin],
+};
 
 function makeid(length: number) {
   let result = '';
@@ -12,19 +17,24 @@ function makeid(length: number) {
   return result;
 }
 
-function resultHandler(db: JsonTable, dbPath?: string, schema?: string) {
-  let result = db.json;
-  if (dbPath) {
-    result = lodash.get(result, dbPath, null);
-  }
+function schemaParser(db: any, schema?: string | null) {
+  let result = db;
+
   if (schema) {
-    result = jsonParser(result, schema);
+    result = jsonParser(db, schema);
   }
 
   return result;
 }
+function accessIsCorrect(str: string) {
+  return Object.keys(JsonUserRole).includes(str);
+}
+const jsonAccessiblity = (jsonAccess: JsonUserRole, userRole: JsonUserRole) => {
+  return accessibilty[jsonAccess].includes(userRole);
+};
+
 function numberWithCommas(x: number) {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
-export { makeid, resultHandler, numberWithCommas };
+export { makeid, schemaParser, numberWithCommas, accessIsCorrect, jsonAccessiblity };

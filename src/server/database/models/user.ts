@@ -1,81 +1,88 @@
-import { Connection, Entity, Column, PrimaryColumn, Repository, OneToMany, JoinColumn } from 'typeorm';
+import { Entity, Column, JoinColumn, OneToMany, PrimaryColumn, BaseEntity } from 'typeorm';
 import md5 from 'md5';
 import { makeid } from '~/utils';
+import UserJson, { UserJsonTable, JsonUserRole } from './user-json';
 import { JsonTable } from './json';
-import { ServerContext } from '~/server/helpers';
+import cache from '../cache';
 
 @Entity({
-  name: 'users__table',
+  name: 'user',
 })
-class UserTable {
+class UserTable extends BaseEntity {
   @PrimaryColumn()
   id: string;
 
-  @PrimaryColumn()
+  @Column({ unique: true })
   username: string;
 
   @Column()
   password: string;
 
   @OneToMany(
-    type => JsonTable,
-    json => json.user,
+    () => UserJsonTable,
+    ju => ju.user,
   )
   @JoinColumn()
-  jsons: JsonTable[];
+  jsonConnection: UserJsonTable[];
 
-  constructor(username: string, password: string) {
-    if (username && password) {
-      this.id = makeid(15);
-      this.username = username;
-      this.password = md5(password);
-    }
-  }
+  createNewJson = async (json: any, access: { read: JsonUserRole; write: JsonUserRole }, role: JsonUserRole) => {
+    const savedJson = await JsonTable.create({ id: makeid(15), json, ...access }).save();
+    await UserJson.create(this, savedJson, role);
+
+    cache.update('json_getCount', p => p + 1);
+
+    return savedJson;
+  };
+
+  addRelationToJson = async (jsonId: string, role: JsonUserRole) => {
+    const userJsonRow = await UserJson.createWithIds(this.id, jsonId, role);
+    cache.del(`${jsonId}_userJson`);
+
+    return userJsonRow;
+  };
 }
-type DbWithoutUser = Omit<ServerContext['db'], 'User'>;
 
 class User {
-  private repository: Repository<UserTable>;
+  hasUsername = (username: string) =>
+    cache.get(`${username}_hasUsername`, async () => {
+      const user = await UserTable.findOne({ username });
 
-  private db: DbWithoutUser;
+      if (user) {
+        return true;
+      }
 
-  constructor(conn: Connection, db: DbWithoutUser) {
-    this.repository = conn.getRepository(UserTable);
-    this.db = db;
-  }
+      return false;
+    });
 
-  hasUsername = async (username: string) => {
-    const user = await this.repository.findOne({ username });
+  getUser = (username: string, password: string) =>
+    cache.get(`${username}_${password}_getUser`, async () => {
+      if (username && password) {
+        return UserTable.findOne({ where: { username, password: md5(password) } });
+      }
 
-    if (user) {
-      return true;
-    }
+      return null;
+    });
 
-    return false;
-  };
-
-  getUser = async (username: string, password: string) => {
-    if ((typeof username === 'string' && typeof password === 'string') || typeof password === 'number') {
-      return this.repository.findOne({ where: { username, password: md5(password) } });
-    }
-
-    return null;
-  };
-
-  getUserById = async (userId: string) => {
-    return this.repository.findOne({ where: { id: userId } });
-  };
+  getUserById = (userId: string) =>
+    cache.get(`${userId}_getUserById`, () => {
+      return UserTable.findOne({ where: { id: userId } });
+    });
 
   update = async (userId: string, newUser: Partial<{ username: string; password: string }>) => {
     const currentUser = await this.getUserById(userId);
     if (currentUser) {
+      cache.delIncluded(currentUser.username);
+
       if (newUser.username) {
         currentUser.username = newUser.username;
       }
       if (newUser.password) {
         currentUser.password = md5(newUser.password);
       }
-      const updatedUser = await this.repository.save(currentUser);
+      const updatedUser = await UserTable.save(currentUser);
+
+      cache.delIncluded(updatedUser.username);
+      cache.delIncluded(updatedUser.id);
 
       return updatedUser;
     }
@@ -83,28 +90,17 @@ class User {
     return currentUser;
   };
 
-  createNewJson = async (userId: string, json: any, isPrivate: boolean) => {
-    const currentUser = await this.getUserById(userId);
-    if (currentUser && isPrivate) {
-      const savedJson = await this.db.Json.savePrivateJson(json, currentUser);
-
-      return savedJson;
-    }
-
-    if (currentUser) {
-      const savedJson = await this.db.Json.savePublicJson(json, currentUser);
-
-      return savedJson;
-    }
-
-    throw new Error('User Not Found');
-  };
-
   save = (username: string, password: string) => {
-    return this.repository.save(new UserTable(username, password));
+    return UserTable.create({ id: makeid(15), username, password: md5(password) })
+      .save()
+      .then(user => {
+        cache.delIncluded(user.username);
+
+        return user;
+      });
   };
 }
 
 export { UserTable };
 
-export default User;
+export default new User();

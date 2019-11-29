@@ -23,6 +23,7 @@ module.exports = {
     config.resolve['alias'] = {
       '~': path.resolve('./src'),
     };
+    config.devtool = dev ? 'eval-source-map' : 'none';
 
     return config;
   },

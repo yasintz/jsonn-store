@@ -11,7 +11,7 @@ function databaseInit(cb: (connection: Connection) => void) {
   })
     .then(connection => cb(connection))
     // eslint-disable-next-line no-console
-    .catch(error => console.log(error));
+    .catch(error => console.error(error));
 }
 
 export default databaseInit;
