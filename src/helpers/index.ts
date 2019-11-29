@@ -1,6 +1,6 @@
 export type MaybeArray<T> = T | T[];
 
-export interface AppContext {
+export interface PageContext {
   jsonCount: number;
   mode: 'create' | 'view';
   database?: {

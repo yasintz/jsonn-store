@@ -5,7 +5,6 @@ import _styled, { createGlobalStyle, Keyframes } from 'styled-components';
 
 import { mixins } from './mixins';
 import { css, globalStyle } from './css';
-import { colors, setTheme } from './theme';
 
 export interface StylableProps {
   className?: string;
@@ -43,6 +42,6 @@ type Styled = StyledJSXIntrinsics &
 const styled: Styled = _styled as Styled;
 const globalStyleCreator = () => createGlobalStyle`${globalStyle()}`;
 
-export { css, createGlobalStyle, mixins, colors, setTheme, globalStyleCreator };
+export { css, createGlobalStyle, mixins, globalStyleCreator };
 
 export default styled;

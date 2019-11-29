@@ -1,26 +1,30 @@
 import React from 'react';
-import Home from './home';
+import { PageContext } from '~/helpers';
+
 import '~/client/assets/style/app.css';
-import { AppContext } from '~/helpers';
-import { isServer } from '../utils';
+import styled from '../styled';
 
 interface AppProps {
-  pageContext: AppContext;
+  pageContext: PageContext;
 }
+const Editor = styled.div`
+  position: absolute;
+  top: 110px;
+  left: 0;
+  right: 0;
+  bottom: 10px;
+`;
 const App: React.SFC<AppProps> = props => {
-  // eslint-disable-next-line
-  // @ts-ignore
-  const socketIo = React.useRef(isServer() ? {} : io()).current; // eslint-disable-line
-  React.useEffect(() => {
-    socketIo.on('messages-yasin', (message: any) => {});
-    socketIo.on('osman', (message: any) => {});
-  }, []);
+  if (props.pageContext.mode === 'view' && props.pageContext.database) {
+    return (
+      <div>
+        <p> Json Count : {props.pageContext.jsonCount} </p>
+        <Editor id="editor">{JSON.stringify(props.pageContext.database.json, null, 4)}</Editor>
+      </div>
+    );
+  }
 
-  return (
-    <>
-      <Home />
-    </>
-  );
+  return <textarea />;
 };
 
 export default App;

@@ -39,8 +39,8 @@ export default (json: any, newValue: any, path: string, action: DatabaseUpdateAc
       cloneJson = newJson;
     }
 
-    return cloneJson;
+    return { newJson: cloneJson, changedJson: newJson };
   } catch (error) {
-    return json;
+    return { newJson: json, changedJson: json };
   }
 };

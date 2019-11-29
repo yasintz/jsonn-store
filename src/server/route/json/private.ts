@@ -24,7 +24,7 @@ function responseCreator(req: Request, id: string) {
     view: generateViewLink(req, id),
   };
 }
-const jsonRoute: RouteType = (app, { db }) => {
+const jsonRoute: RouteType = (app, { db, socket }) => {
   /* CREATE JSON */
   app.post('/json', async (req, res) => {
     try {
@@ -89,12 +89,16 @@ const jsonRoute: RouteType = (app, { db }) => {
       if (jsonDb) {
         const body = { data: jsonDb.json, read: jsonDb.read, write: jsonDb.write, ...req.body } as PostPutBody;
         if (accessIsCorrect(body.read) && accessIsCorrect(body.write)) {
-          const newJson = jsonUpdater(jsonDb.json, body.data, databasePath, databaseAction);
+          const { newJson, changedJson } = jsonUpdater(jsonDb.json, body.data, databasePath, databaseAction);
           if (jsonDb.write === JsonUserRole.everyone) {
             const updatedJsonRow = await db.Json.updatePrivateJson(jsonDb.id, newJson, {
               write: body.write,
               read: body.read,
             });
+            if (databasePath) {
+              socket.emit(`${jsonDb.id}/${databasePath}`, changedJson);
+            }
+            socket.emit(jsonDb.id, newJson);
             res.send({
               result: schemaParser(updatedJsonRow.json, databaseSchema),
             });
@@ -109,6 +113,10 @@ const jsonRoute: RouteType = (app, { db }) => {
               write: body.write,
               read: body.read,
             });
+            if (databasePath) {
+              socket.emit(`${jsonDb.id}/${databasePath}`, changedJson);
+            }
+            socket.emit(jsonDb.id, newJson);
             res.send({
               result: schemaParser(updatedJsonRow.json, databaseSchema),
             });

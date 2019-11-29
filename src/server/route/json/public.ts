@@ -19,7 +19,7 @@ function responseCreator(req: Request, id: string) {
     view: generateViewLink(req, id),
   };
 }
-const jsonRoute: RouteType = (app, { db }) => {
+const jsonRoute: RouteType = (app, { db, socket }) => {
   /* CREATE JSON */
   app.post('/json', async (req, res) => {
     try {
@@ -65,8 +65,12 @@ const jsonRoute: RouteType = (app, { db }) => {
       if (jsonDb && jsonDb.write !== JsonUserRole.everyone) {
         throw appError('Is Private you should use /api/json/ route');
       } else if (jsonDb && req.body.data) {
-        const newJson = jsonUpdater(jsonDb.json, req.body.data, databasePath, databaseAction);
+        const { newJson, changedJson } = jsonUpdater(jsonDb.json, req.body.data, databasePath, databaseAction);
         const updatedJsonRow = await db.Json.updatePublicJson(jsonDb.id, newJson);
+        if (databasePath) {
+          socket.emit(`${jsonDb.id}/${databasePath}`, changedJson);
+        }
+        socket.emit(jsonDb.id, newJson);
         res.send({
           result: schemaParser(updatedJsonRow.json, databaseSchema),
         });
