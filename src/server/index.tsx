@@ -20,7 +20,7 @@ const baseRouter = express.Router();
 
 // eslint-disable-next-line
 
-const corsOptions = {
+const corsOptions: cors.CorsOptions = {
   origin: (origin, callback) => {
     callback(null, true);
   },
