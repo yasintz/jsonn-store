@@ -30,7 +30,7 @@ function template(context: PageContext, hasError?: boolean) {
   const sheet = new ServerStyleSheet();
   const markup = renderToString(sheet.collectStyles(<App pageContext={context} />));
   const styleTags = sheet.getStyleTags();
-  const TODO_refactor = `
+  const todoRefactor = `
     <script
         src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.6/ace.js"
         integrity="sha256-CVkji/u32aj2TeC+D13f7scFSIfphw2pmu4LaKWMSY8="
@@ -59,7 +59,7 @@ function template(context: PageContext, hasError?: boolean) {
             <meta http-equiv="X-UA-Compatible" content="IE=edge" />
             <meta charSet='utf-8' />
             <title>${title}</title>
-            ${TODO_refactor}
+            ${todoRefactor}
              <link rel="icon" href="${iconUrl}" />
             <meta name="viewport" content="width=device-width, initial-scale=1">
              <script src="/socket.io/socket.io.js"></script>
