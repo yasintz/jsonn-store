@@ -112,5 +112,10 @@
     "collectCoverageFrom": [
       "src/**/*.{js,jsx,ts,tsx}"
     ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "yarn check-rule"
+    }
   }
 }
