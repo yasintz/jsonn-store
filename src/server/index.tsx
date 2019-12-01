@@ -1,4 +1,5 @@
 import bodyParser from 'body-parser';
+import cors from 'cors';
 import SocketIO from 'socket.io';
 import express from 'express';
 import { Connection } from 'typeorm';
@@ -19,6 +20,12 @@ const baseRouter = express.Router();
 
 // eslint-disable-next-line
 
+const corsOptions = {
+  origin: (origin, callback) => {
+    callback(null, true);
+  },
+};
+
 function app(dbConnection: Connection, socket: SocketIO.Server) {
   const serverContext: ServerContext = {
     db: {
@@ -35,6 +42,7 @@ function app(dbConnection: Connection, socket: SocketIO.Server) {
     .use(express.static(process.env.RAZZLE_PUBLIC_DIR!))
     .use(express.json({ limit: '50mb' }))
     .use(express.urlencoded({ limit: '50mb', extended: false }))
+    .use(cors(corsOptions))
     .use(bodyParser.json());
 
   /* auth */
