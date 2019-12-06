@@ -16,6 +16,8 @@ export default (json: any, newValue: any, path: string, action: DatabaseUpdateAc
         case DatabaseUpdateActions.push: {
           if (lodash.isArray(currentJson)) {
             currentJson.push(newValue);
+          } else if (currentJson === undefined || currentJson === null) {
+            return [newValue];
           }
 
           return currentJson;
@@ -23,6 +25,10 @@ export default (json: any, newValue: any, path: string, action: DatabaseUpdateAc
         case DatabaseUpdateActions.contact: {
           if (lodash.isArray(currentJson) && lodash.isArray(newValue)) {
             return lodash.concat(currentJson, newValue);
+          }
+
+          if ((currentJson === undefined || currentJson === null) && lodash.isArray(newValue)) {
+            return newValue;
           }
 
           return currentJson;

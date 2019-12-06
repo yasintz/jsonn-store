@@ -24,7 +24,12 @@ const App: React.SFC<AppProps> = props => {
     );
   }
 
-  return <textarea />;
+  return (
+    <>
+      <p> Json Count : {props.pageContext.jsonCount} </p>
+      <textarea />
+    </>
+  );
 };
 
 export default App;

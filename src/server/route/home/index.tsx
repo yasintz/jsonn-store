@@ -59,10 +59,10 @@ function template(context: PageContext, hasError?: boolean) {
             <meta http-equiv="X-UA-Compatible" content="IE=edge" />
             <meta charSet='utf-8' />
             <title>${title}</title>
-            ${todoRefactor}
              <link rel="icon" href="${iconUrl}" />
             <meta name="viewport" content="width=device-width, initial-scale=1">
              <script src="/socket.io/socket.io.js"></script>
+             ${todoRefactor}
             ${styleTags}
             ${importFiles()}
             <script>
