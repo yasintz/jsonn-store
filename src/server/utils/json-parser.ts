@@ -44,4 +44,25 @@ registerHelper('arrayFilterEqualsByKey', ({ args, node, next }) => {
   return next(node);
 });
 
+registerHelper('arrayFindEqualsByKey', ({ args, node, next }) => {
+  if (Array.isArray(node)) {
+    const [itemKey, ...values] = args;
+
+    return next(
+      node.find(item => {
+        let value = item;
+        if (itemKey !== '$') {
+          value = item[itemKey];
+        }
+
+        return values.includes(value);
+      }),
+    );
+  }
+
+  return next(node);
+});
+
+
+
 export default jsonParser;
