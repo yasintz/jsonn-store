@@ -1,13 +1,5 @@
+import lodash from 'lodash';
 import jsonParser, { registerHelper } from 'yasintz-json-parser';
-
-registerHelper('filter', ({ args, node, next }) => {
-  const [key, operator, arg] = args;
-  if (Array.isArray(node) && operator === '>') {
-    return next(node.filter(item => item[key] > parseFloat(arg)));
-  }
-
-  return next(node);
-});
 
 registerHelper('slice', ({ node, args, next }) => {
   try {
@@ -22,13 +14,32 @@ registerHelper('slice', ({ node, args, next }) => {
   return next(node);
 });
 
-registerHelper('getByKey', ({ node, args, next }) => {
+registerHelper('getByPath', ({ node, args, next }) => {
   const [key] = args;
   try {
     if (node !== undefined && node !== null && key) {
-      return next(node[key]);
+      return next(lodash.get(node, key, null));
     }
   } catch (error) {} // eslint-disable-line no-empty
+
+  return next(node);
+});
+
+registerHelper('arrayFilterEqualsByKey', ({ args, node, next }) => {
+  if (Array.isArray(node)) {
+    const [itemKey, ...values] = args;
+
+    return next(
+      node.filter(item => {
+        let value = item;
+        if (itemKey !== '$') {
+          value = item[itemKey];
+        }
+
+        return values.includes(value);
+      }),
+    );
+  }
 
   return next(node);
 });
