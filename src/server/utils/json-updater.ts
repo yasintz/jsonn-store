@@ -1,10 +1,56 @@
 import lodash from 'lodash';
 import { DatabaseUpdateActions } from '../helpers';
 
+function pathParser(json: any, path: string) {
+  const items = path.split('.');
+  if (items.find(item => item.includes('['))) {
+    let correctPath = '';
+    items.forEach(p => {
+      if (p.includes('[')) {
+        const [arrayKey, f] = p.split('[');
+        correctPath += `.${arrayKey}`;
+        const fields = f
+          .substring(0, f.length - 1)
+          .split(',')
+          .map(item => ({ key: item.split('=')[0], value: item.split('=')[1] }));
+        const itselfSelector = fields.find(item => item.key === '$');
+        const array = lodash.get(json, correctPath) as any[];
+        array.find((item, arrayIndex) => {
+          if (itselfSelector && item === itselfSelector.value) {
+            correctPath += `.${arrayIndex}`;
+
+            return true;
+          }
+          let isCorrect = true;
+          fields.forEach(({ key, value }) => {
+            isCorrect = item[key] === value;
+          });
+          if (isCorrect) {
+            correctPath += `.${arrayIndex}`;
+
+            return true;
+          }
+
+          return false;
+        });
+      } else {
+        correctPath += `.${p}`;
+      }
+    });
+
+    return correctPath.substring(1, correctPath.length);
+  }
+
+  return path;
+}
+
 export default (json: any, newValue: any, path: string, action: DatabaseUpdateActions) => {
   try {
+    const correctPath = pathParser(json, path);
     const newJson = (() => {
-      const currentJson = path ? lodash.get(JSON.parse(JSON.stringify(json)), path) : JSON.parse(JSON.stringify(json));
+      const currentJson = correctPath
+        ? lodash.get(JSON.parse(JSON.stringify(json)), correctPath)
+        : JSON.parse(JSON.stringify(json));
       switch (action) {
         case DatabaseUpdateActions.replace:
           return newValue;
@@ -39,8 +85,8 @@ export default (json: any, newValue: any, path: string, action: DatabaseUpdateAc
       }
     })();
     let cloneJson = JSON.parse(JSON.stringify(json));
-    if (path) {
-      lodash.set(cloneJson, path, newJson);
+    if (correctPath) {
+      lodash.set(cloneJson, correctPath, newJson);
     } else {
       cloneJson = newJson;
     }
