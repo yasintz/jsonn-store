@@ -63,6 +63,4 @@ registerHelper('arrayFindEqualsByKey', ({ args, node, next }) => {
   return next(node);
 });
 
-
-
 export default jsonParser;
