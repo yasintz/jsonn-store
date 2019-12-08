@@ -35,7 +35,7 @@
     "socket.io": "^2.3.0",
     "styled-components": "^4.4.1",
     "typeorm": "^0.2.20",
-    "yasintz-json-parser": "^1.0.18"
+    "yasintz-json-parser": "^1.0.19"
   },
   "devDependencies": {
     "@babel/cli": "^7.7.4",
