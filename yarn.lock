@@ -15006,10 +15006,10 @@ yargs@^15.0.0:
     y18n "^4.0.0"
     yargs-parser "^16.1.0"
 
-yasintz-json-parser@^1.0.18:
-  version "1.0.18"
-  resolved "https://registry.yarnpkg.com/yasintz-json-parser/-/yasintz-json-parser-1.0.18.tgz#a97e6a481b5174e446a5bb0826722bd2363c72ca"
-  integrity sha512-t/JvdSN3yJDLFururbfJkCm0+egl12H8EftjuN6ihBF73CsUJUGGYnD+EUHnepOjO6KA/2VFP9eeEcq9Dg4PcQ==
+yasintz-json-parser@^1.0.19:
+  version "1.0.19"
+  resolved "https://registry.yarnpkg.com/yasintz-json-parser/-/yasintz-json-parser-1.0.19.tgz#2a60e45ea44df0e3d5a6807a00e34398db882272"
+  integrity sha512-BfZdvDgxS6YxuEY7PDB3RQRYOs+DJQzfbFdw1D1cAAyXGkesTOcLN/AcgmdfmQB/cVxd/6QJCPyluYB4knErDg==
 
 yeast@0.1.2:
   version "0.1.2"
