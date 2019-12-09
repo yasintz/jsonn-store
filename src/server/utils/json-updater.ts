@@ -8,7 +8,7 @@ function pathParser(json: any, path: string) {
     items.forEach(p => {
       if (p.includes('[')) {
         const [arrayKey, f] = p.split('[');
-        correctPath += `.${arrayKey}`;
+        correctPath += `${correctPath ? '.' : ''}${arrayKey}`;
         const fields = f
           .substring(0, f.length - 1)
           .split(',')
@@ -38,7 +38,7 @@ function pathParser(json: any, path: string) {
       }
     });
 
-    return correctPath.substring(1, correctPath.length);
+    return correctPath;
   }
 
   return path;
@@ -46,51 +46,47 @@ function pathParser(json: any, path: string) {
 
 export default (json: any, newValue: any, path: string, action: DatabaseUpdateActions) => {
   let cloneJson = JSON.parse(JSON.stringify(json));
-  try {
-    const correctPath = pathParser(json, path);
-    const newJson = (() => {
-      const currentJson = correctPath ? lodash.get(cloneJson, correctPath) : cloneJson;
-      switch (action) {
-        case DatabaseUpdateActions.replace:
-          return newValue;
-        case DatabaseUpdateActions.assign:
-          return { ...currentJson, ...newValue };
-        case DatabaseUpdateActions.deepAssign:
-          return lodash.merge(currentJson, newValue);
+  const correctPath = pathParser(json, path);
+  const newJson = (() => {
+    const currentJson = correctPath ? lodash.get(cloneJson, correctPath) : cloneJson;
+    switch (action) {
+      case DatabaseUpdateActions.replace:
+        return newValue;
+      case DatabaseUpdateActions.assign:
+        return { ...currentJson, ...newValue };
+      case DatabaseUpdateActions.deepAssign:
+        return lodash.merge(currentJson, newValue);
 
-        case DatabaseUpdateActions.push: {
-          if (lodash.isArray(currentJson)) {
-            currentJson.push(newValue);
-          } else if (currentJson === undefined || currentJson === null) {
-            return [newValue];
-          }
-
-          return currentJson;
-        }
-        case DatabaseUpdateActions.contact: {
-          if (lodash.isArray(currentJson) && lodash.isArray(newValue)) {
-            return lodash.concat(currentJson, newValue);
-          }
-
-          if ((currentJson === undefined || currentJson === null) && lodash.isArray(newValue)) {
-            return newValue;
-          }
-
-          return currentJson;
+      case DatabaseUpdateActions.push: {
+        if (lodash.isArray(currentJson)) {
+          currentJson.push(newValue);
+        } else if (currentJson === undefined || currentJson === null) {
+          return [newValue];
         }
 
-        default:
-          return currentJson;
+        return currentJson;
       }
-    })();
-    if (correctPath) {
-      lodash.set(cloneJson, correctPath, newJson);
-    } else {
-      cloneJson = newJson;
-    }
+      case DatabaseUpdateActions.contact: {
+        if (lodash.isArray(currentJson) && lodash.isArray(newValue)) {
+          return lodash.concat(currentJson, newValue);
+        }
 
-    return { newJson: cloneJson, changedJson: newJson };
-  } catch (error) {
-    return { newJson: json, changedJson: json };
+        if ((currentJson === undefined || currentJson === null) && lodash.isArray(newValue)) {
+          return newValue;
+        }
+
+        return currentJson;
+      }
+
+      default:
+        return currentJson;
+    }
+  })();
+  if (correctPath) {
+    lodash.set(cloneJson, correctPath, newJson);
+  } else {
+    cloneJson = newJson;
   }
+
+  return { newJson: cloneJson, changedJson: newJson };
 };

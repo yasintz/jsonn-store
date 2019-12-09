@@ -65,12 +65,13 @@ const jsonRoute: RouteType = (app, { db, socket }) => {
       if (jsonDb && jsonDb.write !== JsonUserRole.everyone) {
         throw appError('Is Private you should use /api/json/ route');
       } else if (jsonDb && req.body.data) {
-        const { newJson, changedJson } = jsonUpdater(jsonDb.json, req.body.data, databasePath, databaseAction);
+        const { newJson } = jsonUpdater(jsonDb.json, req.body.data, databasePath, databaseAction);
         const updatedJsonRow = await db.Json.updatePublicJson(jsonDb.id, newJson);
-        if (databasePath) {
-          socket.emit(`${jsonDb.id}/${databasePath}`, changedJson);
-        }
-        socket.emit(jsonDb.id, newJson);
+        // TODO: implement  realtime
+        // if (databasePath) {
+        //   socket.emit(`${jsonDb.id}/${databasePath}`, changedJson);
+        // }
+        // socket.emit(jsonDb.id, newJson);
         res.send({
           result: schemaParser(updatedJsonRow.json, databaseSchema),
         });
