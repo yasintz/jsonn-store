@@ -45,12 +45,11 @@ function pathParser(json: any, path: string) {
 }
 
 export default (json: any, newValue: any, path: string, action: DatabaseUpdateActions) => {
+  let cloneJson = JSON.parse(JSON.stringify(json));
   try {
     const correctPath = pathParser(json, path);
     const newJson = (() => {
-      const currentJson = correctPath
-        ? lodash.get(JSON.parse(JSON.stringify(json)), correctPath)
-        : JSON.parse(JSON.stringify(json));
+      const currentJson = correctPath ? lodash.get(cloneJson, correctPath) : cloneJson;
       switch (action) {
         case DatabaseUpdateActions.replace:
           return newValue;
@@ -84,7 +83,6 @@ export default (json: any, newValue: any, path: string, action: DatabaseUpdateAc
           return currentJson;
       }
     })();
-    let cloneJson = JSON.parse(JSON.stringify(json));
     if (correctPath) {
       lodash.set(cloneJson, correctPath, newJson);
     } else {
