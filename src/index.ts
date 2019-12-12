@@ -24,13 +24,23 @@ const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 const expressApp = express();
 const server = http.createServer(expressApp);
 
-database(connection => {
-  const socketServer = createSocketServer(server);
-  socketServer.on('connection', socket => {
-    socketConnectionHandler(socket, socketServer);
+database()
+  .then(connection => {
+    const socketServer = createSocketServer(server);
+    socketServer.on('connection', socket => {
+      socketConnectionHandler(socket, socketServer);
+    });
+    expressApp.use((req, res) => app(connection, socketServer).handle(req, res));
+  })
+  .catch(error => {
+    expressApp.get('/', (req, res) => {
+      res.send(`
+      <h1 style="color:red;">
+          Database Error 
+      </h1> 
+      `);
+    });
   });
-  expressApp.use((req, res) => app(connection, socketServer).handle(req, res));
-});
 server.listen(port, () => {
   console.log(`> Started on port ${port}`);
 });
