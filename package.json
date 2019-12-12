@@ -1,9 +1,9 @@
 {
-  "name": "razzle-examples-with-typescript",
-  "version": "3.0.0",
+  "name": "jsonn.store",
+  "version": "0.0.1",
   "license": "MIT",
   "scripts": {
-    "crn": "rm -rf node_modules/@types/react-native",
+    "crn": "rm -rf node_modules/@types/react-native && pwd",
     "dev": "yarn crn && razzle start",
     "debug": "yarn crn && razzle start --inspect --inspect-port 9230",
     "build": "yarn crn && razzle build",
@@ -17,6 +17,7 @@
     "check-rule": "yarn tsc && yarn lint && yarn prettier && yarn test"
   },
   "dependencies": {
+    "razzle": "^3.0.0",
     "@babel/runtime": "^7.7.4",
     "axios": "^0.19.0",
     "body-parser": "^1.19.0",
@@ -28,7 +29,6 @@
     "md5": "^2.2.1",
     "node-cache": "^5.0.2",
     "pg": "^7.14.0",
-    "razzle-heroku": "^3.0.0",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "reflect-metadata": "^0.1.13",
@@ -38,6 +38,7 @@
     "yasintz-json-parser": "^1.0.19"
   },
   "devDependencies": {
+    "razzle-heroku": "^3.0.0",
     "@babel/cli": "^7.7.4",
     "@babel/core": "^7.7.4",
     "@babel/preset-env": "^7.7.4",
