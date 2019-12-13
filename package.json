@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "license": "MIT",
   "scripts": {
-    "crn": "rm -rf node_modules/@types/react-native && pwd",
+    "crn": "rm -rf node_modules/@types/react-native",
     "dev": "yarn crn && razzle start",
     "debug": "yarn crn && razzle start --inspect --inspect-port 9230",
     "build": "yarn crn && razzle build",
@@ -17,12 +17,12 @@
     "check-rule": "yarn tsc && yarn lint && yarn prettier && yarn test"
   },
   "dependencies": {
-    "razzle": "^3.0.0",
     "@babel/runtime": "^7.7.4",
     "axios": "^0.19.0",
     "body-parser": "^1.19.0",
     "classnames": "^2.2.6",
     "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.15",
@@ -38,7 +38,6 @@
     "yasintz-json-parser": "^1.0.19"
   },
   "devDependencies": {
-    "razzle-heroku": "^3.0.0",
     "@babel/cli": "^7.7.4",
     "@babel/core": "^7.7.4",
     "@babel/preset-env": "^7.7.4",
@@ -73,7 +72,6 @@
     "babel-loader": "^8.0.6",
     "babel-plugin-styled-components": "^1.10.6",
     "concurrently": "^5.0.0",
-    "cross-env": "^6.0.3",
     "css-loader": "^3.2.0",
     "eslint": "^6.7.1",
     "eslint-config-airbnb": "^18.0.1",
@@ -91,6 +89,7 @@
     "nodemon": "^2.0.1",
     "prettier": "^1.19.1",
     "razzle": "^3.0.0",
+    "razzle-heroku": "^3.0.0",
     "razzle-plugin-typescript": "^3.0.0",
     "ts-jest": "^24.2.0",
     "typescript": "^3.7.2"
