@@ -4,6 +4,8 @@ import express from 'express';
 import createSocketServer from 'socket.io';
 import database from './server/database';
 
+require('dotenv').config();
+
 let app = require('./server').default;
 let socketConnectionHandler = require('./server/sockets').default;
 
