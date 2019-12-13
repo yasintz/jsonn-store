@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken';
 import { RouteType } from '~/server/helpers';
-import { appError } from '../utils/errors';
+import { appError } from '~/server/utils/errors';
 
-const userRoute: RouteType = (app, { db, JWT_SECRET }) => {
+const authRoute: RouteType = (app, { db, JWT_SECRET }) => {
   /* CREATE USER */
   app.post('/signup', async (req, res) => {
     const body = {
@@ -57,4 +57,4 @@ const userRoute: RouteType = (app, { db, JWT_SECRET }) => {
   return app;
 };
 
-export default userRoute;
+export default authRoute;

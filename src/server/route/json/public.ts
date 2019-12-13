@@ -23,8 +23,8 @@ const jsonRoute: RouteType = (app, { db, socket }) => {
   /* CREATE JSON */
   app.post('/json', async (req, res) => {
     try {
-      const body = { data: {}, ...req.body };
-      const json = await db.Json.create(body.data, JsonUserRole.everyone, JsonUserRole.everyone);
+      const data = req.body || {};
+      const json = await db.Json.create(data, JsonUserRole.everyone, JsonUserRole.everyone);
       res.send(responseCreator(req, json.id));
     } catch (error) {
       res.send({ error });
@@ -54,20 +54,22 @@ const jsonRoute: RouteType = (app, { db, socket }) => {
   app.put('/json/:id', async (req, res) => {
     const { path: databasePath, schema: databaseSchema, action: databaseAction } = {
       action: DatabaseUpdateActions.replace,
+      path: '',
+      schema: '',
       ...req.query,
     } as PutQuery;
 
     try {
-      if (!req.body.data) {
-        throw appError('data is required field');
+      if (!req.body) {
+        throw appError('body is required field example {}');
       }
       const jsonDb = await db.Json.getJsonById(req.params.id);
       if (jsonDb && jsonDb.write !== JsonUserRole.everyone) {
         throw appError('Is Private you should use /api/json/ route');
-      } else if (jsonDb && req.body.data) {
-        const { newJson } = jsonUpdater(jsonDb.json, req.body.data, databasePath, databaseAction);
+      } else if (jsonDb) {
+        const { newJson } = jsonUpdater(jsonDb.json, req.body, databasePath, databaseAction);
         const updatedJsonRow = await db.Json.updatePublicJson(jsonDb.id, newJson);
-        // TODO: implement  realtime
+        // TODO: implement [socket]
         // if (databasePath) {
         //   socket.emit(`${jsonDb.id}/${databasePath}`, changedJson);
         // }

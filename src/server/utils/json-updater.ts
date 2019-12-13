@@ -1,6 +1,10 @@
 import lodash from 'lodash';
 import { DatabaseUpdateActions } from '../helpers';
-
+import { appError } from './errors';
+/*
+example path:  
+words[id=axtyax].text
+*/
 function pathParser(json: any, path: string) {
   const items = path.split('.');
   if (items.find(item => item.includes('['))) {
@@ -15,26 +19,30 @@ function pathParser(json: any, path: string) {
           .map(item => ({ key: item.split('=')[0], value: item.split('=')[1] }));
         const itselfSelector = fields.find(item => item.key === '$');
         const array = lodash.get(json, correctPath) as any[];
-        array.find((item, arrayIndex) => {
-          if (itselfSelector && item === itselfSelector.value) {
-            correctPath += `.${arrayIndex}`;
+        if (Array.isArray(array)) {
+          array.find((item, arrayIndex) => {
+            if (itselfSelector && item === itselfSelector.value) {
+              correctPath += `.${arrayIndex}`;
 
-            return true;
-          }
-          let isCorrect = true;
-          fields.forEach(({ key, value }) => {
-            isCorrect = item[key] === value;
+              return true;
+            }
+            let isCorrect = true;
+            fields.forEach(({ key, value }) => {
+              isCorrect = item[key] === value;
+            });
+            if (isCorrect) {
+              correctPath += `.${arrayIndex}`;
+
+              return true;
+            }
+
+            return false;
           });
-          if (isCorrect) {
-            correctPath += `.${arrayIndex}`;
-
-            return true;
-          }
-
-          return false;
-        });
+        } else {
+          throw appError(`${correctPath} not found in json`);
+        }
       } else {
-        correctPath += `.${p}`;
+        correctPath += `${correctPath ? '.' : ''}${p}`;
       }
     });
 

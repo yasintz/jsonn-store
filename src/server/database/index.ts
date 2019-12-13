@@ -2,8 +2,6 @@ import 'reflect-metadata';
 import { createConnection } from 'typeorm';
 import Models from './models';
 
-require('dotenv').config();
-
 function databaseInit() {
   return createConnection({
     type: 'postgres',

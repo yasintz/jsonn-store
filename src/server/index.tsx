@@ -7,12 +7,13 @@ import { ServerContext } from './helpers';
 import privateJsonRoute from './route/json/private';
 import publicJsonRoute from './route/json/public';
 import userRoute from './route/user';
-import loginRegisterRoute from './route/login-register';
+import authRoute from './route/auth';
 import home from './route/home';
 import authFactory from './middleware/auth';
 import Json from './database/models/json';
 import User from './database/models/user';
 import JsonUser from './database/models/user-json';
+import docRoute from './route/doc';
 
 const server = express();
 const apiRouter = express.Router();
@@ -34,8 +35,9 @@ function app(dbConnection: Connection, socket: SocketIO.Server) {
       JsonUser,
     },
     socket,
-    JWT_SECRET: 'yasin-tazeoglu',
+    JWT_SECRET: process.env.JWT_SECRET as string,
   };
+
   server
     .disable('x-powered-by')
     // eslint-disable-next-line
@@ -52,8 +54,9 @@ function app(dbConnection: Connection, socket: SocketIO.Server) {
   server.use('/', baseRouter);
   /* public routes  */
   home(baseRouter, serverContext);
-  loginRegisterRoute(baseRouter, serverContext);
+  authRoute(baseRouter, serverContext);
   publicJsonRoute(baseRouter, serverContext);
+  docRoute(baseRouter, serverContext);
   /* private routes  */
   userRoute(apiRouter, serverContext);
   privateJsonRoute(apiRouter, serverContext);

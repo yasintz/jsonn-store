@@ -80,6 +80,35 @@ class Json {
     throw dbError('Json Not Found');
   };
 
+  updatePrivateJsonAccess = async (jsonId: string, read: JsonUserRole, write: JsonUserRole) => {
+    const jsonDb = await this.getJsonById(jsonId);
+    if (jsonDb) {
+      jsonDb.read = read;
+      jsonDb.write = write;
+      const updatedJson = await jsonDb.save();
+
+      cache.del(`${jsonId}_getById`);
+
+      return updatedJson;
+    }
+
+    throw dbError('Json Not Found');
+  };
+
+  updatePrivateJsonContent = async (jsonId: string, json: any) => {
+    const jsonDb = await this.getJsonById(jsonId);
+    if (jsonDb) {
+      jsonDb.json = json;
+      const updatedJson = await jsonDb.save();
+
+      cache.del(`${jsonId}_getById`);
+
+      return updatedJson;
+    }
+
+    throw dbError('Json Not Found');
+  };
+
   getJsonById = (jsonId: string) => {
     return cache.get(`${jsonId}_getById`, () => JsonTable.findOne({ where: { id: jsonId } }));
   };
