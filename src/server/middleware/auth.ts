@@ -1,34 +1,28 @@
-import { Response, NextFunction } from 'express';
+import { Express } from 'express';
 import jwt from 'jsonwebtoken';
-import { ServerContext, RequestWithUser } from '../helpers';
-import { appError } from '../utils/errors';
+import { ServerContext } from '../helpers';
+import { HTTP401Error } from '../helpers/http-errors';
 
-const authFactory = (ctx: ServerContext) => async (req: RequestWithUser, res: Response, next: NextFunction) => {
-  if (req.headers && req.headers.authorization) {
+const auth = async (server: Express, ctx: ServerContext) => {
+  server.use('/api', async (req, res, next) => {
     try {
-      const verifiedToken = jwt.verify(req.headers.authorization, ctx.JWT_SECRET) as any;
-      const user = await ctx.db.User.getUserById(verifiedToken.userId);
-      if (user) {
-        req.user = user;
-        next();
+      if (req.headers && req.headers.authorization) {
+        const verifiedToken = jwt.verify(req.headers.authorization, ctx.JWT_SECRET) as any;
+        const user = await ctx.db.User.getUserById(verifiedToken.userId);
+        if (user) {
+          res.locals.user = user;
+          next();
+
+          return;
+        }
+        throw new HTTP401Error('Failed to authenticate token!');
       }
-      throw appError('Failed to authenticate token!');
+
+      throw new HTTP401Error('No Token');
     } catch (err) {
-      res.status(401).json({
-        error: {
-          msg: 'Failed to authenticate token!',
-        },
-      });
+      next(err);
     }
-
-    return;
-  }
-
-  res.status(401).json({
-    error: {
-      msg: 'No token!',
-    },
   });
 };
 
-export default authFactory;
+export default auth;

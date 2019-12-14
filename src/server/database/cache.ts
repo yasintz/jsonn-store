@@ -8,20 +8,20 @@ class Cache {
   }
 
   get = <T>(key: string, storeFunction: () => Promise<T>): Promise<T> => {
-    const value = this.cache.get<T>(key);
-    if (value) {
-      return Promise.resolve(value);
-    }
+    // const value = this.cache.get<T>(key);
+    // if (value) {
+    //   return Promise.resolve(value);
+    // }
 
     return storeFunction().then(result => {
-      this.cache.set(key, result);
+      // this.cache.set(key, result);
 
       return result;
     });
   };
 
   update = (key: string, u: (prev: any) => any) => {
-    this.cache.set(key, u(this.cache.get(key)));
+    // this.cache.set(key, u(this.cache.get(key)));
   };
 
   del = (keys: string) => {

@@ -1,18 +1,21 @@
-import { RouteType, RequestWithUser } from '~/server/helpers';
+import { Route } from '~/server/helpers';
 import { schemaParser, jsonAccessiblity } from '~/server/utils';
-import { appError } from '~/server/utils/errors';
 import { JsonUserRole } from '~/server/database/models/user-json';
+import { checkHasJson } from '~/server/middleware/check';
+import { JsonTable } from '~/server/database/models/json';
+import { HTTP403Error } from '~/server/helpers/http-errors';
+import { UserTable } from '~/server/database/models/user';
 
-const getJsonRoute: RouteType = (app, ctx) => {
-  const { db } = ctx;
-
-  /* GET JSON */
-  app.get('/json/:id', async (req, res) => {
-    try {
-      const { user } = req as RequestWithUser;
-      const { schema: databaseSchema } = req.query;
-      const jsonDb = await db.Json.getJsonById(req.params.id);
-      if (jsonDb) {
+const getJsonRoute: Route = {
+  path: '/json/:id',
+  method: 'get',
+  handler: ctx => [
+    checkHasJson(ctx),
+    async (req, res, next) => {
+      try {
+        const user = res.locals.user as UserTable;
+        const { schema: databaseSchema } = req.query;
+        const jsonDb = res.locals.jsonDb as JsonTable;
         if (jsonDb.read === JsonUserRole.everyone) {
           res.send({
             result: schemaParser(jsonDb.json, databaseSchema),
@@ -29,13 +32,12 @@ const getJsonRoute: RouteType = (app, ctx) => {
 
           return;
         }
-        throw appError('Erisim Izni Yok');
+        throw new HTTP403Error('Erisim Izni Yok');
+      } catch (error) {
+        next(error);
       }
-      throw appError('Json Not Found');
-    } catch (error) {
-      res.status(500).send({ status: 500, ...error });
-    }
-  });
+    },
+  ],
 };
 
 export default getJsonRoute;

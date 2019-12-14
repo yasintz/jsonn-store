@@ -4,16 +4,12 @@ import SocketIO from 'socket.io';
 import express from 'express';
 import { Connection } from 'typeorm';
 import { ServerContext } from './helpers';
-import privateJsonRoute from './route/json/private';
-import publicJsonRoute from './route/json/public';
-import userRoute from './route/user';
-import authRoute from './route/auth';
-import home from './route/home';
-import authFactory from './middleware/auth';
 import Json from './database/models/json';
 import User from './database/models/user';
 import JsonUser from './database/models/user-json';
-import docRoute from './route/doc';
+import route from './route';
+import applyMiddleware from './middleware';
+import applyErrorHandlers from './middleware/error-handler';
 
 const server = express();
 const apiRouter = express.Router();
@@ -47,19 +43,13 @@ function app(dbConnection: Connection, socket: SocketIO.Server) {
     .use(cors(corsOptions))
     .use(bodyParser.json());
 
-  /* auth */
-  server.use('/api', authFactory(serverContext) as any);
-  /* routes */
+  applyMiddleware(server, serverContext);
+
   server.use('/api', apiRouter);
   server.use('/', baseRouter);
-  /* public routes  */
-  home(baseRouter, serverContext);
-  authRoute(baseRouter, serverContext);
-  publicJsonRoute(baseRouter, serverContext);
-  docRoute(baseRouter, serverContext);
-  /* private routes  */
-  userRoute(apiRouter, serverContext);
-  privateJsonRoute(apiRouter, serverContext);
+
+  route(apiRouter, baseRouter, serverContext);
+  applyErrorHandlers(server);
 
   return server;
 }

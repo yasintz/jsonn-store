@@ -1,60 +1,59 @@
 import jwt from 'jsonwebtoken';
-import { RouteType } from '~/server/helpers';
-import { appError } from '~/server/utils/errors';
+import lodash from 'lodash';
+import { checkAuthBody } from '~/server/middleware/check';
+import { HTTP404Error, HTTP400Error } from '~/server/helpers/http-errors';
+import { Route } from '~/server/helpers';
 
-const authRoute: RouteType = (app, { db, JWT_SECRET }) => {
-  /* CREATE USER */
-  app.post('/signup', async (req, res) => {
-    const body = {
-      ...req.body,
-    };
-    try {
-      if (body.username && body.password) {
-        const hasUser = await db.User.hasUsername(body.username);
-        if (hasUser) {
-          throw appError('Username Daha once kayit edilmis');
+const authRoute: Route[] = [
+  {
+    method: 'post',
+    path: '/signup',
+    handler: ({ db }) => [
+      checkAuthBody,
+      async (req, res, next) => {
+        try {
+          const hasUser = await db.User.hasUsername(req.body.username);
+          if (hasUser) {
+            throw new HTTP400Error('Username Daha once kayit edilmis');
+          }
+          const newUser = await db.User.save(req.body.username, req.body.password);
+          res.send(lodash.omit(newUser, 'password'));
+        } catch (error) {
+          next(error);
         }
-        const newUser = await db.User.save(body.username, body.password);
-        delete newUser.password;
-        res.send(newUser);
-      } else {
-        throw appError('Username pass yok');
-      }
-    } catch (error) {
-      res.status(500).send({ error });
-    }
-  });
+      },
+    ],
+  },
 
-  /* LOGIN USER */
-  app.post('/login', async (req, res) => {
-    try {
-      if (req.body.username && req.body.password) {
-        const user = await db.User.getUser(req.body.username, req.body.password);
-        if (user) {
-          delete user.password;
+  {
+    method: 'post',
+    path: '/login',
+    handler: ctx => [
+      checkAuthBody,
+      async (req, res, next) => {
+        try {
+          const { db, JWT_SECRET } = ctx;
+          const user = await db.User.getUser(req.body.username, req.body.password);
+          if (!user) {
+            throw new HTTP404Error('User Not Found');
+          }
+
           res.json({
-            ...user,
+            ...lodash.omit(user, 'password'),
             token: jwt.sign(
               {
-                userId: user.id,
+                userId: (user as any).id,
               },
               JWT_SECRET,
               { expiresIn: 60 * 60 },
             ),
           });
-
-          return;
+        } catch (error) {
+          next(error);
         }
-        throw appError('Username Not Found');
-      }
-
-      throw appError('Username pass yok');
-    } catch (error) {
-      res.status(500).send({ error });
-    }
-  });
-
-  return app;
-};
+      },
+    ],
+  },
+];
 
 export default authRoute;

@@ -1,6 +1,6 @@
 import lodash from 'lodash';
 import { DatabaseUpdateActions } from '../helpers';
-import { appError } from './errors';
+import { HTTP404Error } from '../helpers/http-errors';
 /*
 example path:  
 words[id=axtyax].text
@@ -39,7 +39,7 @@ function pathParser(json: any, path: string) {
             return false;
           });
         } else {
-          throw appError(`${correctPath} not found in json`);
+          throw new HTTP404Error(`${correctPath} not found in json`);
         }
       } else {
         correctPath += `${correctPath ? '.' : ''}${p}`;

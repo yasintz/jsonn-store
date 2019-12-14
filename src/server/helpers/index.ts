@@ -1,6 +1,6 @@
-import { Request, Router } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import SocketIO from 'socket.io';
-import User, { UserTable } from '../database/models/user';
+import User from '../database/models/user';
 import Json from '../database/models/json';
 import JsonUser from '../database/models/user-json';
 
@@ -24,6 +24,14 @@ export enum DatabaseUpdateActions {
   contact = 'contact',
 }
 
-export type RequestWithUser = Request & { user: UserTable };
+export type Handler = (req: Request, res: Response, next: NextFunction) => Promise<void> | void;
 
-export type RouteType = (app: Router, context: ServerContext) => void;
+export type HandlerWithContext = (
+  ctx: ServerContext,
+) => (req: Request, res: Response, next: NextFunction) => Promise<void> | void;
+
+export type Route = {
+  path: string;
+  method: 'get' | 'post' | 'put';
+  handler: (ctx: ServerContext) => Handler[];
+};

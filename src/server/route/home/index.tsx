@@ -1,5 +1,5 @@
 import React from 'react';
-import { RouteType } from '~/server/helpers';
+import { Route } from '~/server/helpers';
 import App from '~/client/app';
 import { PageContext } from '~/helpers';
 import { JsonUserRole } from '~/server/database/models/user-json';
@@ -39,37 +39,41 @@ function template(context: PageContext, hasError?: boolean) {
   });
 }
 
-const homeRoute: RouteType = (app, { db }) => {
-  app.get(`/`, async (req, res) => {
-    const { id: databaseId } = req.query;
-    try {
-      const jsonCount = await db.Json.getCount();
-      if (databaseId) {
-        const currentDabaase = await db.Json.getJsonById(databaseId);
-        if (currentDabaase && currentDabaase.read === JsonUserRole.everyone) {
-          const context: PageContext = {
-            jsonCount,
-            mode: 'view',
-            database: {
-              id: currentDabaase.id,
-              json: currentDabaase.json,
-            },
-          };
-          res.send(template(context));
+const homeRoute: Route = {
+  path: '/',
+  method: 'get',
+  handler: ctx => [
+    async (req, res) => {
+      const { id: databaseId } = req.query;
+      try {
+        const jsonCount = await ctx.db.Json.getCount();
+        if (databaseId) {
+          const currentDabaase = await ctx.db.Json.getJsonById(databaseId);
+          if (currentDabaase && currentDabaase.read === JsonUserRole.everyone) {
+            const context: PageContext = {
+              jsonCount,
+              mode: 'view',
+              database: {
+                id: currentDabaase.id,
+                json: currentDabaase.json,
+              },
+            };
+            res.send(template(context));
 
-          return;
+            return;
+          }
         }
+        const context: PageContext = {
+          jsonCount,
+          mode: 'create',
+        };
+        res.send(template(context));
+      } catch (error) {
+        // TODO: send error mode
+        // res.send(template(null, true));
       }
-      const context: PageContext = {
-        jsonCount,
-        mode: 'create',
-      };
-      res.send(template(context));
-    } catch (error) {
-      // TODO: send error mode
-      // res.send(template(null, true));
-    }
-  });
+    },
+  ],
 };
 
 export default homeRoute;

@@ -7,6 +7,7 @@
     "dev": "yarn crn && razzle start",
     "debug": "yarn crn && razzle start --inspect --inspect-port 9230",
     "build": "yarn crn && razzle build",
+    "start-locale": "node build/server.js",
     "start": "pm2 start build/server.js --name \"server\"",
     "stop": "pm2 stop server && pm2 delete server",
     "lint": "eslint './src/**/*.ts*' './test/**/*.test.ts*' --cache",

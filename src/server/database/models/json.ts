@@ -1,8 +1,8 @@
 import { Entity, Column, OneToMany, PrimaryColumn, BaseEntity } from 'typeorm';
 import { JsonUserRole, UserJsonTable } from './user-json';
 import { makeid } from '~/utils';
-import { dbError } from '~/server/utils/errors';
 import cache from '../cache';
+import { HTTP404Error } from '~/server/helpers/http-errors';
 
 @Entity({
   name: 'json',
@@ -61,7 +61,7 @@ class Json {
       return updatedJson;
     }
 
-    throw dbError('Json Not Found');
+    throw new HTTP404Error('Json Not Found');
   };
 
   updatePrivateJson = async (jsonId: string, json: any, access: { read: JsonUserRole; write: JsonUserRole }) => {
@@ -77,7 +77,7 @@ class Json {
       return updatedJson;
     }
 
-    throw dbError('Json Not Found');
+    throw new HTTP404Error('Json Not Found');
   };
 
   updatePrivateJsonAccess = async (jsonId: string, read: JsonUserRole, write: JsonUserRole) => {
@@ -92,7 +92,7 @@ class Json {
       return updatedJson;
     }
 
-    throw dbError('Json Not Found');
+    throw new HTTP404Error('Json Not Found');
   };
 
   updatePrivateJsonContent = async (jsonId: string, json: any) => {
@@ -106,7 +106,7 @@ class Json {
       return updatedJson;
     }
 
-    throw dbError('Json Not Found');
+    throw new HTTP404Error('Json Not Found');
   };
 
   getJsonById = (jsonId: string) => {
