@@ -1,10 +1,12 @@
 import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { ServerStyleSheet } from 'styled-components';
+import App from './client/app';
+import { getStyles } from './client/styled';
 
 interface HtmlProps {
-  sources?: string;
-  app: React.ReactElement;
+  props: any;
+  type: 'doc' | 'app';
 }
 
 function importFiles() {
@@ -22,10 +24,24 @@ function importFiles() {
       `;
 }
 
-function html({ app, sources }: HtmlProps) {
+function html({ props, type }: HtmlProps) {
+  const app = <App {...(props as any)} type={type} />;
   const sheet = new ServerStyleSheet();
   const markup = renderToString(sheet.collectStyles(app));
   const styleTags = sheet.getStyleTags();
+  const source =
+    type === 'app'
+      ? `
+     <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.6/ace.js"
+      integrity="sha256-CVkji/u32aj2TeC+D13f7scFSIfphw2pmu4LaKWMSY8="
+      crossorigin="anonymous"
+    ></script> 
+    <script>
+      window.Ace = ace;
+    </script>
+  `
+      : '';
 
   const title = 'Jsonn.Store';
 
@@ -39,11 +55,16 @@ function html({ app, sources }: HtmlProps) {
             <meta charSet='utf-8' />
             <title>${title}</title>
              <link rel="icon" href="${iconUrl}" />
-            <meta name="viewport" content="width=device-width, initial-scale=1">
+             <meta name="viewport" content="width=device-width, initial-scale=1">
+             <style>${getStyles()}</style>
              <script src="/socket.io/socket.io.js"></script>
              ${styleTags}
-             ${sources || ''}
+            <script>
+                window.PAGE_PROPS = ${JSON.stringify(props)};
+                window.PAGE_TYPE = ${JSON.stringify(type)};
+            </script>
              ${importFiles()}
+             ${source}
           </head>
           <body>
             <div id="root">${markup}</div>

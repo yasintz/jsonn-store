@@ -27,6 +27,7 @@
     "suppressImplicitAnyIndexErrors": true,
     "target": "es2016",
     "baseUrl": ".",
+    "typeRoots": ["./node_modules/@types", "./src/helpers/declaration.d.ts"],
     "paths": {
       "~/*": ["src/*"]
     }

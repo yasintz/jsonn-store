@@ -1,6 +1,6 @@
 import { css as styledCss, keyframes as styledKeyframes } from 'styled-components';
 import cx from 'classnames';
-import { makeid } from '~/utils';
+import { makeSameId } from '~/utils';
 import { ExpressTypes } from '.';
 
 interface Styles {
@@ -28,7 +28,7 @@ function cssToString(_styles: TemplateStringsArray, ...args: CssExpressionType) 
 function css(_styles: TemplateStringsArray, ...args: CssExpressionType) {
   const _css = cssToString(_styles, ...args);
 
-  const className = makeid(9);
+  const className = makeSameId();
   styles.push({ className, css: _css });
 
   return className;
@@ -53,7 +53,7 @@ css.global = globalCss;
 css.cx = cx;
 css.keyframes = keyframes;
 
-const globalStyle = () => `
+const getStyles = () => `
 ${styles.map(style => `.${style.className}{${style.css}}`).join('')}
 ${globals.join('\n')}
 `;
@@ -68,4 +68,4 @@ const _css: {
   cx: typeof cx;
 } = css;
 
-export { _css as css, globalStyle };
+export { _css as css, getStyles };

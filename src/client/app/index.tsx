@@ -2,34 +2,30 @@ import React from 'react';
 import { PageContext } from '~/helpers';
 
 import '~/client/assets/style/app.css';
-import styled from '../styled';
+import Doc from '../pages/doc';
+import Home from '../pages/home';
+import Detail from '../pages/detail';
 
 interface AppProps {
-  pageContext: PageContext;
+  pageContext?: PageContext;
+  items?: { id: string; title: string; content: string }[];
+  type: 'doc' | 'app';
 }
-const Editor = styled.div`
-  position: absolute;
-  top: 110px;
-  left: 0;
-  right: 0;
-  bottom: 10px;
-`;
+
 const App: React.SFC<AppProps> = props => {
-  if (props.pageContext.mode === 'view' && props.pageContext.database) {
-    return (
-      <div>
-        <p> Json Count : {props.pageContext.jsonCount} </p>
-        <Editor id="editor">{JSON.stringify(props.pageContext.database.json, null, 4)}</Editor>
-      </div>
-    );
+  if (props.type === 'doc' && props.items) {
+    return <Doc items={props.items} />;
   }
 
-  return (
-    <>
-      <p> Json Count : {props.pageContext.jsonCount} </p>
-      <textarea />
-    </>
-  );
+  if (props.pageContext && props.type === 'app') {
+    if (props.pageContext.mode === 'view' && props.pageContext.database) {
+      return <Detail db={props.pageContext.database} count={props.pageContext.jsonCount} />;
+    }
+
+    return <Home count={props.pageContext.jsonCount} />;
+  }
+
+  return <div>Undefined</div>;
 };
 
 export default App;

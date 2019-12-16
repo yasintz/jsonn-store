@@ -1,10 +1,10 @@
 /* eslint-disable import/no-duplicates,@typescript-eslint/no-explicit-any */
 import * as React from 'react';
 
-import _styled, { createGlobalStyle, Keyframes } from 'styled-components';
+import _styled, { Keyframes } from 'styled-components';
 
 import { mixins } from './mixins';
-import { css, globalStyle } from './css';
+import { css, getStyles } from './css';
 
 export interface StylableProps {
   className?: string;
@@ -40,8 +40,7 @@ type Styled = StyledJSXIntrinsics &
 // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 // @ts-ignore
 const styled: Styled = _styled as Styled;
-const globalStyleCreator = () => createGlobalStyle`${globalStyle()}`;
 
-export { css, createGlobalStyle, mixins, globalStyleCreator };
+export { css, mixins, getStyles };
 
 export default styled;
