@@ -1,15 +1,11 @@
 import React from 'react';
-import { PageContext } from '~/helpers';
+import { PageProps } from '~/helpers';
 import Template from '~/client/components/template';
-import { css } from '~/client/styled';
 
 interface DetailProps {
-  db: PageContext['database'];
+  db: PageProps['database'];
   count: number;
 }
-const customcss = css`
-  color: red;
-`;
 
 const Detail: React.SFC<DetailProps> = props => {
   return <Template count={props.count} page="detail" db={props.db} />;

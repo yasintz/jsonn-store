@@ -1,9 +1,11 @@
 import { css as styledCss, keyframes as styledKeyframes } from 'styled-components';
 import cx from 'classnames';
-import { makeSameId } from '~/utils';
+import { makeid } from '~/utils';
 import { ExpressTypes } from '.';
+import { isServer } from '../utils';
 
 interface Styles {
+  minCss: string;
   css: string;
   className: string;
 }
@@ -13,25 +15,33 @@ type CssExpressionType = (string | number)[];
 const styles: Styles[] = [];
 const globals: string[] = [];
 
+function minifyCss(c: string) {
+  return c
+    .replace(/(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/gm, ' ')
+    .replace(/\s+/g, ' ')
+    .replace(/(\r\n|\n|\r)/gm, ' ');
+}
+
 function cssToString(_styles: TemplateStringsArray, ...args: CssExpressionType) {
   let mergedCss = '';
   _styles.forEach((_css, index) => {
     mergedCss += _css + (args[index] || '');
   });
 
-  return mergedCss
-    .replace(/(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/gm, ' ')
-    .replace(/\s+/g, ' ')
-    .replace(/(\r\n|\n|\r)/gm, ' ');
+  return mergedCss;
 }
 
 function css(_styles: TemplateStringsArray, ...args: CssExpressionType) {
   const _css = cssToString(_styles, ...args);
 
-  const className = makeSameId();
-  styles.push({ className, css: _css });
+  if (isServer()) {
+    const className = makeid(8);
+    styles.push({ className, minCss: minifyCss(_css), css: _css });
 
-  return className;
+    return className;
+  }
+
+  return window.CSS[_css];
 }
 
 function globalCss(_styles: TemplateStringsArray, ...args: CssExpressionType) {
@@ -53,10 +63,12 @@ css.global = globalCss;
 css.cx = cx;
 css.keyframes = keyframes;
 
-const getStyles = () => `
-${styles.map(style => `.${style.className}{${style.css}}`).join('')}
+const getStyleContent = () => `
+${styles.map(style => `.${style.className}{${style.minCss}}`).join('')}
 ${globals.join('\n')}
 `;
+
+const getStyles = () => styles;
 
 // eslint-disable-next-line
 // @ts-ignore
@@ -68,4 +80,4 @@ const _css: {
   cx: typeof cx;
 } = css;
 
-export { _css as css, getStyles };
+export { _css as css, getStyleContent, getStyles };

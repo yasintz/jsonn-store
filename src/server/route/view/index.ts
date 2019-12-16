@@ -2,13 +2,13 @@ import fs from 'fs';
 import lodash from 'lodash';
 import path from 'path';
 import { Route } from '~/server/helpers';
-import { PageContext } from '~/helpers';
+import { PageProps } from '~/helpers';
 import { JsonUserRole } from '~/server/database/models/user-json';
 import html from '~/html';
 
-function template(context: PageContext, hasError?: boolean) {
+function template(context: PageProps, hasError?: boolean) {
   return html({
-    props: { pageContext: context },
+    props: { context },
     type: 'app',
   });
 }
@@ -33,7 +33,7 @@ const homeRoute: Route[] = [
 
         res.send(
           html({
-            props: { items },
+            props: { context: items },
             type: 'doc',
           }),
         );
@@ -51,7 +51,7 @@ const homeRoute: Route[] = [
           if (databaseId) {
             const currentDabaase = await ctx.db.Json.getJsonById(databaseId);
             if (currentDabaase && currentDabaase.read === JsonUserRole.everyone) {
-              const context: PageContext = {
+              const context: PageProps = {
                 jsonCount,
                 mode: 'view',
                 database: {
@@ -64,7 +64,7 @@ const homeRoute: Route[] = [
               res.redirect('/');
             }
           } else {
-            const context: PageContext = {
+            const context: PageProps = {
               jsonCount,
               mode: 'create',
             };

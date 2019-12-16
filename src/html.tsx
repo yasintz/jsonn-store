@@ -1,13 +1,9 @@
 import React from 'react';
+import { StaticRouter } from 'react-router-dom';
 import { renderToString } from 'react-dom/server';
 import { ServerStyleSheet } from 'styled-components';
 import App from './client/app';
-import { getStyles } from './client/styled';
-
-interface HtmlProps {
-  props: any;
-  type: 'doc' | 'app';
-}
+import { getStyles, getStyleContent } from './client/styled/css';
 
 function importFiles() {
   // eslint-disable-next-line
@@ -24,29 +20,24 @@ function importFiles() {
       `;
 }
 
-function html({ props, type }: HtmlProps) {
-  const app = <App {...(props as any)} type={type} />;
+function html(props: any, url: string) {
+  const app = (
+    <StaticRouter location={url}>
+      <App {...(props as any)} />
+    </StaticRouter>
+  );
   const sheet = new ServerStyleSheet();
   const markup = renderToString(sheet.collectStyles(app));
   const styleTags = sheet.getStyleTags();
-  const source =
-    type === 'app'
-      ? `
-     <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.6/ace.js"
-      integrity="sha256-CVkji/u32aj2TeC+D13f7scFSIfphw2pmu4LaKWMSY8="
-      crossorigin="anonymous"
-    ></script> 
-    <script>
-      window.Ace = ace;
-    </script>
-  `
-      : '';
-
   const title = 'Jsonn.Store';
 
   const iconUrl =
     'https://user-images.githubusercontent.com/36041339/69496155-1cfc9580-0ee0-11ea-810e-ef60a567b708.png';
+
+  const cssObj = {};
+  getStyles().forEach(item => {
+    cssObj[item.css] = item.className;
+  });
 
   return `<!doctype html>
         <html lang="">
@@ -56,15 +47,20 @@ function html({ props, type }: HtmlProps) {
             <title>${title}</title>
              <link rel="icon" href="${iconUrl}" />
              <meta name="viewport" content="width=device-width, initial-scale=1">
-             <style>${getStyles()}</style>
+             <style>${getStyleContent()}</style>
              <script src="/socket.io/socket.io.js"></script>
+             <script
+               src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.6/ace.js"
+               integrity="sha256-CVkji/u32aj2TeC+D13f7scFSIfphw2pmu4LaKWMSY8="
+               crossorigin="anonymous"
+             ></script> 
              ${styleTags}
             <script>
                 window.PAGE_PROPS = ${JSON.stringify(props)};
-                window.PAGE_TYPE = ${JSON.stringify(type)};
+                window.CSS = ${JSON.stringify(cssObj)};
+                window.Ace = ace;
             </script>
              ${importFiles()}
-             ${source}
           </head>
           <body>
             <div id="root">${markup}</div>

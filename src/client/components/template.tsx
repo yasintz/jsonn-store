@@ -1,5 +1,5 @@
 import React from 'react';
-import { PageContext } from '~/helpers';
+import { PageProps } from '~/helpers';
 import Container from '~/client/components/container';
 import Editor from '~/client/components/editor';
 import UIButton from '~/client/components/button';
@@ -8,7 +8,7 @@ import { BavenIcon } from '~/client/assets/icons';
 import { numberWithCommas } from '~/server/utils';
 
 interface TemplateProps {
-  db?: PageContext['database'];
+  db?: PageProps['database'];
   count: number;
   page: 'detail' | 'create';
 }

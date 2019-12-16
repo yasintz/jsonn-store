@@ -1,10 +1,12 @@
 export type MaybeArray<T> = T | T[];
 
-export interface PageContext {
+interface DocumentItem {
+  id: string;
+  title: string;
+  content: string;
+}
+
+export interface PageProps {
   jsonCount: number;
-  mode: 'create' | 'view';
-  database?: {
-    json: any;
-    id: any;
-  };
+  docs: Array<DocumentItem>;
 }

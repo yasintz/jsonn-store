@@ -4,7 +4,7 @@ import * as React from 'react';
 import _styled, { Keyframes } from 'styled-components';
 
 import { mixins } from './mixins';
-import { css, getStyles } from './css';
+import { css } from './css';
 
 export interface StylableProps {
   className?: string;
@@ -41,6 +41,6 @@ type Styled = StyledJSXIntrinsics &
 // @ts-ignore
 const styled: Styled = _styled as Styled;
 
-export { css, mixins, getStyles };
+export { css, mixins };
 
 export default styled;

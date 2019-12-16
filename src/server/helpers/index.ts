@@ -31,7 +31,7 @@ export type HandlerWithContext = (
 ) => (req: Request, res: Response, next: NextFunction) => Promise<void> | void;
 
 export type Route = {
-  path: string;
+  path: string | string[];
   method: 'get' | 'post' | 'put';
   handler: (ctx: ServerContext) => Handler[];
 };
