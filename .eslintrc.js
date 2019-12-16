@@ -1,4 +1,5 @@
 const closedRules = {
+  'import/extensions': 0,
   'no-use-before-define': 0,
   'no-unused-vars': 0,
   'react/destructuring-assignment': 0,

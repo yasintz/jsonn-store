@@ -20,9 +20,15 @@ function importFiles() {
       `;
 }
 
-function html(props: any, url: string) {
+interface Props {
+  props: any;
+  url: string;
+  ctx: any;
+}
+
+function html({ props, url, ctx }: Props) {
   const app = (
-    <StaticRouter location={url}>
+    <StaticRouter location={url} context={ctx}>
       <App {...(props as any)} />
     </StaticRouter>
   );

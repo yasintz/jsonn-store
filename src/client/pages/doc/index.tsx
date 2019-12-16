@@ -4,9 +4,10 @@ import Markdown from 'react-markdown';
 import renderers from 'react-markdown-github-renderers';
 import styled from '~/client/styled';
 import Sidebar from './sidebar';
+import createPage from '../create-page';
 
 interface Props {
-  items: { id: string; title: string; content: string }[];
+  docs: { id: string; title: string; content: string }[];
 }
 
 const Container = styled.div`
@@ -16,12 +17,12 @@ const Container = styled.div`
   display: flex;
 `;
 
-function Doc({ items }: Props) {
+function Doc({ docs }: Props) {
   return (
     <Container>
-      <Sidebar items={items} />
+      <Sidebar items={docs} />
       <div>
-        {items.map(({ id, content }, index) => (
+        {docs.map(({ id, content }, index) => (
           <div key={id}>
             <div id={id} />
             <Markdown source={content} escapeHtml={false} renderers={renderers} />
@@ -32,4 +33,8 @@ function Doc({ items }: Props) {
   );
 }
 
-export default Doc;
+export default createPage(Doc, async ({ privateRoute }) => {
+  const docs = await privateRoute('get-docs');
+
+  return { docs };
+});

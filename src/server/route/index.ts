@@ -4,7 +4,7 @@ import privateJsonRoute from './json/private';
 import publicJsonRoute from './json/public';
 import userRoute from './user';
 import authRoute from './auth';
-import view from './view';
+import view from './client';
 
 export const applyRoutes = (routes: Route[], router: Router, ctx: ServerContext) => {
   // eslint-disable-next-line
@@ -14,6 +14,6 @@ export const applyRoutes = (routes: Route[], router: Router, ctx: ServerContext)
 };
 
 export default (apiRouter: Router, baseRouter: Router, ctx: ServerContext) => {
-  applyRoutes([...authRoute, ...publicJsonRoute, ...view], baseRouter, ctx);
+  applyRoutes([...authRoute, ...publicJsonRoute, view], baseRouter, ctx);
   applyRoutes([...userRoute, ...privateJsonRoute], apiRouter, ctx);
 };

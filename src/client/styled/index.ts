@@ -6,6 +6,8 @@ import _styled, { Keyframes } from 'styled-components';
 import { mixins } from './mixins';
 import { css } from './css';
 
+interface IProblemSolver {}
+
 export interface StylableProps {
   className?: string;
 }

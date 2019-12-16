@@ -1,53 +1,59 @@
-import fs from 'fs';
-import lodash from 'lodash';
-import path from 'path';
+import { matchPath } from 'react-router-dom';
 import { Route } from '~/server/helpers';
 import html from '~/html';
 import clientRoutes from '~/client/pages';
-
-const getDocById = (name: string) =>
-  `${fs.readFileSync(path.join(process.cwd(), 'statics', 'doc', `${name}.md`), 'UTF-8')}`;
-
-const privateRoutes = {
-  getDocs: () => {
-    return fs.readdirSync(path.join(process.cwd(), 'statics', 'doc')).map(item => {
-      const id = item.replace('.md', '');
-
-      return {
-        id,
-        title: lodash.startCase(id),
-        content: getDocById(id),
-      };
-    });
-  },
-};
+import privateRoutes from './private-routes';
 
 const clientRoute: Route = {
-  path: ['/', '/doc'],
+  path: ['/', '/doc', '/view-json/:id'],
   method: 'get',
   handler: ctx => [
     async (req, res) => {
+      const context = { url: '' };
+      const _privateRoutes = privateRoutes(ctx);
       const matches = clientRoutes.map((route, index) => {
-        // const match = matchPath(req.url, route.path, route);
+        const match = matchPath(req.path, route);
+
         return {
           route,
           // match,
-          promise: route.getInitialData
-            ? route.getInitialData({
-                privateRoute: (key: string, params: any) => (privateRoutes[key] ? privateRoutes[key](params) : null),
-              })
-            : Promise.resolve(null),
+          promise:
+            route.getInitialData && match
+              ? route.getInitialData({
+                  privateRoute: (key: string, params: any) =>
+                    _privateRoutes[key] ? _privateRoutes[key](params) : null,
+                  match,
+                  query: req.query,
+                  redirect: path => {
+                    if (path !== req.path) {
+                      context.url = path;
+                    }
+                  },
+                })
+              : Promise.resolve(null),
         };
       });
+
       Promise.all(matches.map(({ promise }) => promise)).then(data => {
-        res.send(
-          html(
-            {
-              initialData: data,
-            },
-            req.url,
-          ),
-        );
+        if (context.url) {
+          res.redirect(context.url);
+
+          return;
+        }
+        const htmlString = html({
+          props: {
+            initialData: data,
+          },
+          url: req.url,
+          ctx: context,
+        });
+        if (context.url) {
+          res.redirect(301, context.url);
+
+          return;
+        }
+
+        res.send(htmlString);
       });
     },
   ],

@@ -1,15 +1,15 @@
 import React from 'react';
+import { BrowserRouter } from 'react-router-dom';
 import { hydrate } from 'react-dom';
 import App from './app';
-import { EditorContextProvider } from './context/editor';
 
-const { PAGE_PROPS, PAGE_TYPE } = window;
+// @ts-ignore
+const { PAGE_PROPS } = window;
 
 hydrate(
-  <EditorContextProvider initialValue={PAGE_PROPS}>
-    <App {...PAGE_PROPS} type={PAGE_TYPE} />
-  </EditorContextProvider>,
-
+  <BrowserRouter>
+    <App {...PAGE_PROPS} />
+  </BrowserRouter>,
   document.getElementById('root'),
 );
 

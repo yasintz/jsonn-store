@@ -33,8 +33,4 @@ const jsonAccessiblity = (jsonAccess: JsonUserRole, userRole: JsonUserRole) => {
   return accessibilty[jsonAccess].includes(userRole);
 };
 
-function numberWithCommas(x: number) {
-  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-}
-
-export { makeid, schemaParser, numberWithCommas, accessIsCorrect, jsonAccessiblity };
+export { makeid, schemaParser, accessIsCorrect, jsonAccessiblity };
