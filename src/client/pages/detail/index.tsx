@@ -1,6 +1,6 @@
 import React from 'react';
 import Container from '~/client/components/container';
-import styled, { mixins } from '~/client/styled';
+import styled from '~/client/styled';
 import Editor from '~/client/components/editor';
 import UILink from '~/client/components/link';
 import { BavenIcon, ContractIcon } from '~/client/assets/icons';

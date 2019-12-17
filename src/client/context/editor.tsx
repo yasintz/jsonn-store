@@ -11,7 +11,6 @@ interface EditorContext {
   setValue: (v: string) => void;
   getJsonValue: () => any;
   atachPretty: () => void;
-  makeReadOnly: () => void;
 }
 
 const initialContextValue: EditorContext = {
@@ -21,7 +20,6 @@ const initialContextValue: EditorContext = {
   setValue: () => null,
   getJsonValue: () => null,
   atachPretty: () => null,
-  makeReadOnly: () => null,
 };
 
 const EditorContext = React.createContext<EditorContext>(initialContextValue);
@@ -54,7 +52,6 @@ const EditorContextProvider = (props: React.PropsWithChildren<EditorContextProvi
       setValue,
       value,
       pretty,
-      makeReadOnly: () => {},
       getJsonValue: () => {
         if (aceEditor) {
           return JSON.parse(aceEditor.getValue());

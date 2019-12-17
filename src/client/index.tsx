@@ -3,8 +3,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { hydrate } from 'react-dom';
 import App from './app';
 
-// @ts-ignore
-const { PAGE_PROPS } = window;
+const { PAGE_PROPS } = window as any;
 
 hydrate(
   <BrowserRouter>
