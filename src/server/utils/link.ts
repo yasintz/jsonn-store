@@ -8,7 +8,7 @@ function generateApiLink(req: Request, id?: string, isPublic = false) {
 }
 function generateViewLink(req: Request, id?: string) {
   const apiUrl = new URL(`${req.protocol}://${req.get('host')}${req.originalUrl}`).origin;
-  const url = new URL(id ? `?id=${id}` : '', apiUrl).href;
+  const url = new URL(id ? `/view-json/${id}` : '', apiUrl).href;
 
   return url;
 }

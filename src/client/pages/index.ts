@@ -2,7 +2,7 @@ import React from 'react';
 import { match } from 'react-router-dom';
 import Doc from './doc';
 import Home from './home';
-import Detail from './detail'
+import Detail from './detail';
 
 export interface GetInitialDataProps {
   privateRoute: (routePath: string, params?: any) => Promise<any>;
@@ -31,7 +31,7 @@ const routes: ClientRoute[] = [
   {
     path: '/view-json/:id',
     ...Detail,
-  }
+  },
 ];
 
 export default routes;
