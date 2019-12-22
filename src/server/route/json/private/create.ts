@@ -28,7 +28,7 @@ const createJsonRoute: Route[] = [
         try {
           const user = res.locals.user as UserTable;
           const jsonRow = await user.createNewJson(
-            req.body,
+            req.body.data || {},
             { read: JsonUserRole.admin, write: JsonUserRole.admin },
             JsonUserRole.admin,
           );

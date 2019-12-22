@@ -69,7 +69,7 @@ const App: React.SFC<AppProps> = props => {
         <StyledButtonWrapper>
           <UIButton
             onClick={() => {
-              axios.post('/json', editorContext.getJsonValue()).then(({ data }) => {
+              axios.post('/json', { data: editorContext.getJsonValue() }).then(({ data }) => {
                 // eslint-disable-next-line
                 location.href = data.view;
               });

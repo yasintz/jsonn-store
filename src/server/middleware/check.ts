@@ -41,6 +41,18 @@ const checkHasJson: HandlerWithContext = ({ db }) => async (req, res, next) => {
   }
 };
 
+const checkHasData: Handler = (req, res, next) => {
+  try {
+    if (req.body.data) {
+      next();
+    } else {
+      throw new HTTP404Error('Json Not Found');
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
 const checkAccessParams: Handler = (req, res, next) => {
   try {
     const body = {
@@ -59,4 +71,4 @@ const checkAccessParams: Handler = (req, res, next) => {
   }
 };
 
-export { checkAuthBody, checkUpdateUserBody, checkHasJson, checkAccessParams };
+export { checkAuthBody, checkUpdateUserBody, checkHasJson, checkAccessParams, checkHasData };

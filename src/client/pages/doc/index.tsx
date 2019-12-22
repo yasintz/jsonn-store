@@ -1,5 +1,6 @@
 import React from 'react';
 import Markdown from 'react-markdown';
+// eslint-disable-next-line
 // @ts-ignore
 import renderers from 'react-markdown-github-renderers';
 import styled, { css } from '~/client/styled';

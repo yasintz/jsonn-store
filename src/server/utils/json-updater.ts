@@ -3,11 +3,12 @@ import { DatabaseUpdateActions } from '../helpers';
 import { HTTP404Error } from '../helpers/http-errors';
 /*
 example path:  
-words[id=axtyax].text
+words[id=your_id].text
+words[id=your_id,or_other_id].text
 */
 function pathParser(json: any, path: string) {
-  const items = path.split('.');
-  if (items.find(item => item.includes('['))) {
+  if (path.includes('[')) {
+    const items = path.split('.');
     let correctPath = '';
     items.forEach(p => {
       if (p.includes('[')) {
@@ -58,14 +59,14 @@ export default (json: any, newValue: any, path: string, action: DatabaseUpdateAc
   const newJson = (() => {
     const currentJson = correctPath ? lodash.get(cloneJson, correctPath) : cloneJson;
     switch (action) {
-      case DatabaseUpdateActions.replace:
+      case DatabaseUpdateActions.REPLACE:
         return newValue;
-      case DatabaseUpdateActions.assign:
+      case DatabaseUpdateActions.ASSIGN:
         return { ...currentJson, ...newValue };
-      case DatabaseUpdateActions.deepAssign:
+      case DatabaseUpdateActions.DEEP_ASSIGN:
         return lodash.merge(currentJson, newValue);
 
-      case DatabaseUpdateActions.push: {
+      case DatabaseUpdateActions.PUSH: {
         if (lodash.isArray(currentJson)) {
           currentJson.push(newValue);
         } else if (currentJson === undefined || currentJson === null) {
@@ -74,7 +75,7 @@ export default (json: any, newValue: any, path: string, action: DatabaseUpdateAc
 
         return currentJson;
       }
-      case DatabaseUpdateActions.contact: {
+      case DatabaseUpdateActions.CONTACT: {
         if (lodash.isArray(currentJson) && lodash.isArray(newValue)) {
           return lodash.concat(currentJson, newValue);
         }

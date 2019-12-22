@@ -2,7 +2,7 @@ import { DatabaseUpdateActions, Route } from '~/server/helpers';
 import { schemaParser, jsonAccessiblity } from '~/server/utils';
 import { JsonUserRole } from '~/server/database/models/user-json';
 import jsonUpdater from '~/server/utils/json-updater';
-import { checkHasJson } from '~/server/middleware/check';
+import { checkHasJson, checkHasData } from '~/server/middleware/check';
 import { JsonTable } from '~/server/database/models/json';
 import { UserTable } from '~/server/database/models/user';
 import { HTTP403Error } from '~/server/helpers/http-errors';
@@ -17,19 +17,20 @@ const updateJsonContentRoute: Route = {
   path: '/json/:id',
   method: 'put',
   handler: ctx => [
+    checkHasData,
     checkHasJson(ctx),
     async (req, res, next) => {
       try {
         const user = res.locals.user as UserTable;
         const jsonDb = res.locals.jsonDb as JsonTable;
         const { path: databasePath, schema: databaseSchema, action: databaseAction } = {
-          action: DatabaseUpdateActions.replace,
+          action: DatabaseUpdateActions.REPLACE,
           path: '',
           schema: '',
           ...req.query,
         } as PutQuery;
 
-        const { newJson } = jsonUpdater(jsonDb.json, req.body, databasePath, databaseAction);
+        const { newJson } = jsonUpdater(jsonDb.json, req.body.data, databasePath, databaseAction);
         if (jsonDb.write === JsonUserRole.everyone) {
           const updatedJsonRow = await ctx.db.Json.updatePrivateJsonContent(jsonDb.id, newJson);
           // TODO: implement [socket]

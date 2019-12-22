@@ -4,7 +4,7 @@ import { generateViewLink, generateApiLink } from '~/server/utils/link';
 import { schemaParser } from '~/server/utils';
 import { JsonUserRole } from '~/server/database/models/user-json';
 import jsonUpdater from '~/server/utils/json-updater';
-import { checkHasJson } from '~/server/middleware/check';
+import { checkHasJson, checkHasData } from '~/server/middleware/check';
 import { JsonTable } from '~/server/database/models/json';
 import { HTTP404Error, HTTP400Error } from '~/server/helpers/http-errors';
 
@@ -42,11 +42,12 @@ const jsonRoute: Route[] = [
     path: '/json/:id',
     method: 'put',
     handler: ctx => [
+      checkHasData,
       checkHasJson(ctx),
       async (req, res, next) => {
         try {
           const { path: databasePath, schema: databaseSchema, action: databaseAction } = {
-            action: DatabaseUpdateActions.replace,
+            action: DatabaseUpdateActions.REPLACE,
             path: '',
             schema: '',
             ...req.query,
@@ -56,7 +57,7 @@ const jsonRoute: Route[] = [
           if (jsonDb.write !== JsonUserRole.everyone) {
             throw new HTTP400Error('Is Private you should use /api/json/ route');
           } else {
-            const { newJson } = jsonUpdater(jsonDb.json, req.body, databasePath, databaseAction);
+            const { newJson } = jsonUpdater(jsonDb.json, req.body.data, databasePath, databaseAction);
             const updatedJsonRow = await ctx.db.Json.updatePublicJson(jsonDb.id, newJson);
             // TODO: implement [socket]
             // if (databasePath) {

@@ -17,11 +17,11 @@ export interface ServerContext {
 }
 
 export enum DatabaseUpdateActions {
-  replace = 'replace',
-  assign = 'assign',
-  deepAssign = 'deep-assign',
-  push = 'push',
-  contact = 'contact',
+  REPLACE = 'replace',
+  ASSIGN = 'assign',
+  DEEP_ASSIGN = 'deep-assign',
+  PUSH = 'push',
+  CONTACT = 'contact',
 }
 
 export type Handler = (req: Request, res: Response, next: NextFunction) => Promise<void> | void;
