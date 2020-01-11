@@ -1,5 +1,6 @@
 'use strict';
 const path = require('path');
+const razzleHeroku = require('razzle-heroku');
 
 module.exports = {
   plugins: [
@@ -18,6 +19,7 @@ module.exports = {
     },
   ],
   modify: (config, { target, dev }, webpack) => {
+     config = razzleHeroku(config, {target, dev}, webpack);
     config.resolve['alias'] = {
       '~': path.resolve('./src'),
     };
