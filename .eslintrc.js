@@ -1,4 +1,5 @@
 const closedRules = {
+  'no-useless-return': 0,
   'import/extensions': 0,
   'no-unused-expressions': 0,
   'no-use-before-define': 0,

@@ -2,10 +2,11 @@
   "files.exclude": {
     "build": true,
     "coverage": true,
-    "dist": true,
+    "now.json": true,
     "yarn.lock": true,
-    "*.log": true,
-    ".eslintcache": true
-  },
-  "prettier.configPath": "./.prettierrc.js"
+    ".eslintcache": true,
+    "public": true,
+    "src/server": true,
+    "src/client": true
+  }
 }

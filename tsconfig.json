@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "allowJs": true,
+    "skipLibCheck": true,
     "allowUnreachableCode": false,
     "noFallthroughCasesInSwitch": true,
     "outDir": "dist",
@@ -28,7 +29,8 @@
     "target": "es2016",
     "baseUrl": ".",
     "paths": {
-      "~/*": ["src/*"]
+      "@client/*": ["src/client/src/*"],
+      "@server/*": ["src/server/src/*"]
     }
   },
   "exclude": [
@@ -39,8 +41,7 @@
     "webpack",
     "coverage",
     "jest",
-    "razzle.config.js",
-    "node_modules/@types/react-native/**/*"
+    "razzle.config.js"
   ],
   "types": ["typePatches", "node", "webpack-env"]
 }
