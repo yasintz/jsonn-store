@@ -1,0 +1,19 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Api/Server",
+      "preLaunchTask": "api-build",
+      "program": "${workspaceFolder}/build/index.js",
+      "cwd": "${workspaceFolder}",
+      "outFiles": ["${workspaceFolder}/build/**/*.js"],
+      "protocol": "inspector",
+      "env": {
+        "DEBUG_MODE": "vscode",
+        "NODE_ENV": "development"
+      }
+    }
+  ]
+}
