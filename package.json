@@ -43,11 +43,11 @@
     "uuid": "^8.0.0"
   },
   "scripts": {
-    "start": "nodemon src/index.ts",
+    "dev": "nodemon src/index.ts",
     "debug": "node --inspect-brk -r ts-node/register src/index.ts",
     "build": "tsc",
     "type-check": "tsc --noEmit",
-    "start-prod": "node build/index.js",
+    "start": "node build/index.js",
     "eslint": "eslint ./src --ext .jsx,.ts,.tsx,.js --cache",
     "eslint:fix": "yarn eslint --fix",
     "prettier": "prettier \"src/**/*\"",
