@@ -21,7 +21,7 @@ const jsonDatabaseRoutes: Route[] = [
     path: '/:username',
     rateLimit: {
       windowMs: '1 minutes',
-      max: 5,
+      max: 100,
     },
     schema: {
       params: Joi.object({ username: Joi.string().required() }),
@@ -35,7 +35,7 @@ const jsonDatabaseRoutes: Route[] = [
     path: '/:username',
     rateLimit: {
       windowMs: '1 minutes',
-      max: 5,
+      max: 100,
     },
     schema: {
       params: Joi.object({ username: Joi.string().required() }),
@@ -49,7 +49,7 @@ const jsonDatabaseRoutes: Route[] = [
     path: '/:username',
     rateLimit: {
       windowMs: '1 minutes',
-      max: 5,
+      max: 100,
     },
     schema: {
       params: Joi.object({ username: Joi.string().required() }),
