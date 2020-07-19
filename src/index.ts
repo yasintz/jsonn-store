@@ -8,22 +8,22 @@ import { connectToDatabase } from './database';
 import routes from './routes';
 import HTTPClientError from './helpers/http-client-error';
 import { validateSchemaMiddleware } from './middleware';
-import { HTTP_ERROR_MESSAGES } from './utils/constants';
+// import { HTTP_ERROR_MESSAGES } from './utils/constants';
 
 require('dotenv').config();
 
 const PORT = process.env.PORT || 9000;
 const UPLOAD_LIMIT = '2mb';
 
-const allowedOrigins = ['http://localhost:5000'];
+// const allowedOrigins = ['http://localhost:5000'];
 
 const corsMiddleware = cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
 
-    if (allowedOrigins.indexOf(origin) === -1) {
-      return callback(new HTTPClientError(400, HTTP_ERROR_MESSAGES.CORS_POLICY), false);
-    }
+    // if (allowedOrigins.indexOf(origin) === -1) {
+    //   return callback(new HTTPClientError(400, HTTP_ERROR_MESSAGES.CORS_POLICY), false);
+    // }
 
     return callback(null, true);
   },
