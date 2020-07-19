@@ -1,7 +1,5 @@
 require('dotenv').config();
 
-const config = {
-  REDISCLOUD_URL: process.env.REDISCLOUD_URL as string,
-};
+const config = {};
 
 export default config;

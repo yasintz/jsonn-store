@@ -2,20 +2,15 @@ import ms from 'ms';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
-import RateLimitRedisStore from 'rate-limit-redis';
-import redis from 'redis';
 import express from 'express';
 import applyErrorHandlers from './middleware/error-handler';
 import { connectToDatabase } from './database';
 import routes from './routes';
-import config from './config';
 import HTTPClientError from './helpers/http-client-error';
 import { validateSchemaMiddleware } from './middleware';
 import { HTTP_ERROR_MESSAGES } from './utils/constants';
 
 require('dotenv').config();
-
-const redisClient = redis.createClient(config.REDISCLOUD_URL);
 
 const PORT = process.env.PORT || 9000;
 const UPLOAD_LIMIT = '2mb';
@@ -59,7 +54,6 @@ class App {
     routes.forEach(route => {
       const { handler, method, path, middlewares, rateLimit: routeRateLimit, schema: routeSchema } = route;
       const rateLimiter = rateLimit({
-        store: new RateLimitRedisStore({ client: redisClient }),
         max: routeRateLimit.max,
         windowMs: ms(routeRateLimit.windowMs),
         handler: (req, res, next) => {
