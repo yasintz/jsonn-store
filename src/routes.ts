@@ -31,6 +31,19 @@ const jsonDatabaseRoutes: Route[] = [
     handler: jsonDatabase.getOrCreateDatabaseHandler,
   },
   {
+    method: 'get',
+    path: '/:username',
+    rateLimit: {
+      windowMs: '1 minutes',
+      max: 100,
+    },
+    schema: {
+      params: Joi.object({ username: Joi.string().required() }),
+    },
+    middlewares: [],
+    handler: jsonDatabase.getDatabase,
+  },
+  {
     method: 'put',
     path: '/:username',
     rateLimit: {

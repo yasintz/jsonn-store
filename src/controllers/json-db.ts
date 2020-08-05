@@ -13,6 +13,15 @@ const getOrCreateDatabaseHandler: Handler<object, { username: string }, { db?: o
   res.json(database.db);
 };
 
+const getDatabase: Handler<object, { username: string }, { db?: object }> = async (req, res) => {
+  const [getError, database] = await to(jsonDatabaseService.getByUsername(req.params.username));
+  if (getError || !database) {
+    throw new HTTPClientError(400, HTTP_ERROR_MESSAGES.AN_ERROR_OCCURRED);
+  }
+
+  res.json(database.db);
+};
+
 const updateDatabaseHandler: Handler<object, { username: string }, { db: object }> = async (req, res) => {
   const [updateOrCreateError, database] = await to(
     jsonDatabaseService.updateOrCreate(req.params.username, req.body.db),
@@ -39,4 +48,4 @@ const removeHandler: Handler<{ isRemoved: boolean }, { username: string }> = asy
   res.json({ isRemoved: !removeError });
 };
 
-export { getOrCreateDatabaseHandler, updateDatabaseHandler, removeHandler };
+export { getOrCreateDatabaseHandler, updateDatabaseHandler, removeHandler, getDatabase };
